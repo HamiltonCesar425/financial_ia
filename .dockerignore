@@ -1,0 +1,10 @@
+.venv
+__pycache__
+.git
+.gitignore
+tests
+*.__pycache__*.pyo
+*.pyd
+.env
+data
+notebooks
