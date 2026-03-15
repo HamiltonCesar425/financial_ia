@@ -1,0 +1,8 @@
+[
+  "tests/test_health_score.py::test_classificacao_coerente",
+  "tests/test_health_score.py::test_componentes_existem",
+  "tests/test_health_score.py::test_indice_cai_com_choque_negativo",
+  "tests/test_health_score.py::test_indice_esta_no_intervalo_valido",
+  "tests/test_health_score.py::test_indice_maior_em_cenario_de_crescimento",
+  "tests/test_health_score.py::test_regressao_deterministica_indice"
+]
