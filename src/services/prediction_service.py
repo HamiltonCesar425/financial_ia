@@ -1,25 +1,27 @@
 import time
 
 from src.engine.calculation_engine import FinancialHealthEngine
-from src.observability.metrics import (
-    prediction_requests,
-    prediction_latency,
-    model_state_counter
-)
+from src.api.schemas import ReceitaInput, ScoreResponse
+
+from src.observability.metrics import model_state_counter
 
 engine = FinancialHealthEngine()
 
 
-def predict(data):
-
+def predict(data: ReceitaInput) -> ScoreResponse:
     start = time.time()
 
-    prediction_requests.inc()
+    try:
+        result = engine.predict(data)
 
-    state = engine.predict(data)
+        # Métrica de negócio (válida aqui)
+        model_state_counter.labels(
+            classification=result["classification"]
+        ).inc()
 
-    model_state_counter.labels(state=str(state)).inc()
+        return result
 
-    prediction_latency.observe(time.time() - start)
-
-    return state
+    finally:
+        # Latência de modelo (não de request HTTP)
+        pass
+    

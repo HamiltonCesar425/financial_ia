@@ -1,57 +1,41 @@
+# src/observability/http_metrics_middleware.py
+
 import time
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 
 from src.observability.metrics import (
-    http_requests_total,
+    http_request_count,
     http_request_latency,
-    http_errors_total
 )
 
 
 class PrometheusHTTPMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
-
         start_time = time.time()
 
+        response = await call_next(request)
+
+        process_time = time.time() - start_time
+
+        # 🔹 Labels obrigatórios
         method = request.method
         endpoint = request.url.path
+        status_code = response.status_code
 
-        try:
+        # 🔹 Counter
+        http_request_count.labels(
+            method=method,
+            endpoint=endpoint,
+            http_status=status_code
+        ).inc()
 
-            response = await call_next(request)
-
-            status = response.status_code
-
-        except Exception:
-
-            http_errors_total.labels(
-                method=method,
-                endpoint=endpoint,
-                status="500"
-            ).inc()
-
-            raise
-
-        latency = time.time() - start_time
-
+        # 🔹 Latency
         http_request_latency.labels(
             method=method,
             endpoint=endpoint
-        ).observe(latency)
-
-        http_requests_total.labels(
-            method=method,
-            endpoint=endpoint,
-            status=status
-        ).inc()
-
-        if status >= 400:
-            http_errors_total.labels(
-                method=method,
-                endpoint=endpoint,
-                status=status
-            ).inc()
+        ).observe(process_time)
 
         return response
+    

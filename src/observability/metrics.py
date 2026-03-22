@@ -1,46 +1,43 @@
+# src/observability/metrics.py
+
 from prometheus_client import Counter, Histogram
 
-# Total de requisições de previsão
-prediction_requests = Counter(
-    "financial_ia_predictions_total",
-    "Total number of prediction requests"
+# =========================================================
+# 🔹 HTTP METRICS
+# =========================================================
+
+http_request_count = Counter(
+    name="http_requests_total",
+    documentation="Total number of HTTP requests",
+    labelnames=["method", "endpoint", "http_status"]
 )
 
-# Latência das previsões
-prediction_latency = Histogram(
-    "financial_ia_prediction_latency_seconds",
-    "Latency of prediction requests",
-    buckets=(0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2, 5)
-)
-
-# Distribuição dos estados previstos pelo modelo
-model_state_counter = Counter(
-    "financial_ia_model_state_total",
-    "Total predictions by financial state",
-    ["state"]
-
-)
-
-# Contador de requisições
-http_requests_total = Counter(
-    "financial_ia_http_requests_total",
-    "Total number of HTTP requests",
-    ["method", "endpoint", "status"]
-)
-
-# Latência HTTP
 http_request_latency = Histogram(
-    "financial_ia_http_request_latency_seconds",
-    "HTTP requests latency",
-    ["method", "endpoint"],
-    buckets=(0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2, 5)
-)   
-
-# contador de erros
-
-http_errors_total = Counter(
-    "financial_ia_http_errors_total",
-    "Total number of HTTP errors",
-    ["method", "endpoint", "status"]
+    name="http_request_duration_seconds",
+    documentation="HTTP request latency in seconds",
+    labelnames=["method", "endpoint"]
 )
 
+# =========================================================
+# 🔹 BUSINESS METRICS
+# =========================================================
+
+prediction_count = Counter(
+    name="prediction_total",
+    documentation="Total number of predictions"
+)
+
+prediction_errors = Counter(
+    name="prediction_errors_total",
+    documentation="Total number of prediction errors"
+)
+
+# =========================================================
+# 🔹 MODEL STATE METRICS (CRÍTICO)
+# =========================================================
+
+model_state_counter = Counter(
+    name="model_state_total",
+    documentation="Model state transitions",
+    labelnames=["state"]
+)
