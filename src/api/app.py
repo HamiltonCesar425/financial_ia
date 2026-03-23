@@ -9,10 +9,9 @@ from src.core.logging import setup_logging
 from src.services.prediction_service import predict as predict_service
 
 from src.observability.metrics import (
-    REQUEST_COUNT,
-    REQUEST_LATENCY,
-    PREDICTION_COUNT,
-    PREDICTION_ERRORS
+    prediction_count,
+    prediction_errors,
+    model_state_counter
 )
 
 print(">>> APP.PY REAL CARREGADO <<<")
@@ -26,35 +25,31 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# 🔹 Endpoint de métricas (Prometheus)
 @app.get("/metrics")
 def metrics():
     return Response(generate_latest(), media_type="text/plain")
 
+
+# 🔹 Middleware HTTP (responsável por métricas HTTP)
 app.add_middleware(PrometheusHTTPMiddleware)
 
 
+# 🔹 Endpoint principal
 @app.post("/financial-health-score", response_model=ScoreResponse)
 def financial_health_score(data: ReceitaInput):
 
-    REQUEST_COUNT.inc()
-    start_time = time.time()
-
     try:
+        # 🔹 Métrica de uso do modelo
+        model_state_counter.labels(state="inference").inc()
+
         prediction = predict_service(data.receita)
 
-        PREDICTION_COUNT.inc()
+        prediction_count.inc()
 
-        return {
-            "score": prediction,
-            "classification": "unknown",
-            "pillars": {},
-            "metadata": {}
-        }
+        return prediction
 
     except Exception:
-        PREDICTION_ERRORS.inc()
+        prediction_errors.inc()
         logger.exception("Erro durante predição")
         raise
-
-    finally:
-        REQUEST_LATENCY.observe(time.time() - start_time)

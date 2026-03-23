@@ -85,10 +85,13 @@ class FinancialHealthEngine:
 
         # 🔹 Cálculo de pilares
         pillars = {
-            "crescimento": score_crescimento(metrics["crescimento"]),
-            "estabilidade": score_estabilidade(metrics["volatilidade"]),
-            "consistencia": score_consistencia(metrics["tendencia"]),
-            "resiliencia": score_resiliencia(metrics["drawdown"])
+            k: float(v)
+            for k, v in {
+                "crescimento": score_crescimento(metrics["crescimento"]),
+                "estabilidade": score_estabilidade(metrics["volatilidade"]),
+                "consistencia": score_consistencia(metrics["tendencia"]),
+                "resiliencia": score_resiliencia(metrics["drawdown"])
+            }.items()
         }
 
         # 🔹 Pesos dos pilares
@@ -114,3 +117,4 @@ class FinancialHealthEngine:
                 "data_points": int(len(receita))
             }
         }
+    

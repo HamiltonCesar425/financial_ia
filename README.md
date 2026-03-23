@@ -7,8 +7,11 @@ The project combines financial metrics, scoring engines and simulation component
 ---
 
 ![Python](https://img.shields.io/badge/Python-3.10-blue)
+
 ![Tests](https://img.shields.io/badge/tests-pytest-green)
+
 ![Coverage](https://img.shields.io/badge/coverage-22%25-orange)
+
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 ---

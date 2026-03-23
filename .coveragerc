@@ -1,4 +1,5 @@
-[run]
+#pytest.ini
+[coverage:run]
 omit =
-    src/__version__.py
+    src/main.py
     

@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 
 # ==============================================================================
@@ -32,18 +33,59 @@ PESOS_PRESETS = {
 # ==============================================================================
 
 def logistic_positive(x, center=0.05, steepness=12):
-    """
-    Para métricas onde maior é melhor (growth, momentum).
-    center = ponto neutro
-    """
+    """Maior é melhor"""
+    x = np.nan_to_num(x, nan=0.0, posinf=1e6, neginf=-1e6)
     return 100 / (1 + np.exp(-steepness * (x - center)))
 
 
 def logistic_negative(x, center=0.10, steepness=12):
-    """
-    Para métricas onde menor é melhor (volatilidade, erro).
-    """
+    """Menor é melhor"""
+    x = np.nan_to_num(x, nan=0.0, posinf=1e6, neginf=-1e6)
     return 100 / (1 + np.exp(steepness * (x - center)))
+
+
+# ==============================================================================
+# VALIDAÇÕES AUXILIARES
+# ==============================================================================
+
+def _validar_dataframe(df: pd.DataFrame):
+    if df is None or not isinstance(df, pd.DataFrame):
+        raise ValueError("Entrada deve ser um DataFrame válido.")
+
+    if df.empty:
+        raise ValueError("DataFrame não pode ser vazio.")
+
+    if "receita" not in df.columns:
+        raise ValueError("Coluna 'receita' obrigatória.")
+
+    if df["receita"].isna().any():
+        raise ValueError("Dados contêm valores NaN na coluna 'receita'.")
+
+
+def _validar_rmse(rmse):
+    if rmse is None:
+        return
+
+    if not isinstance(rmse, (int, float)):
+        raise ValueError("RMSE deve ser numérico.")
+
+    if np.isnan(rmse) or np.isinf(rmse):
+        raise ValueError("RMSE inválido.")
+
+    if rmse < 0:
+        raise ValueError("RMSE não pode ser negativo.")
+
+
+def _validar_pesos(pesos: dict):
+    if not isinstance(pesos, dict):
+        raise ValueError("Pesos devem ser um dicionário.")
+
+    if not np.isclose(sum(pesos.values()), 1.0):
+        raise ValueError("A soma dos pesos deve ser 1.")
+
+    for k in ["crescimento", "volatilidade", "momentum", "erro_modelo"]:
+        if k not in pesos:
+            raise ValueError(f"Peso ausente: {k}")
 
 
 # ==============================================================================
@@ -52,8 +94,8 @@ def logistic_negative(x, center=0.10, steepness=12):
 
 def calcular_indice_saude(df, rmse=None, preset="balanceado", pesos=None):
 
-    if df.empty or "receita" not in df.columns:
-        raise ValueError("DataFrame inválido.")
+    _validar_dataframe(df)
+    _validar_rmse(rmse)
 
     receita = df["receita"].astype(float)
 
@@ -68,7 +110,11 @@ def calcular_indice_saude(df, rmse=None, preset="balanceado", pesos=None):
         n = len(receita) - 1
         vi = receita.iloc[0]
         vf = receita.iloc[-1]
-        growth = 0.0 if vi <= 0 else (vf / vi) ** (1 / n) - 1
+
+        if vi <= 0 or vf <= 0:
+            growth = 0.0
+        else:
+            growth = (vf / vi) ** (1 / n) - 1
 
     # Volatilidade
     pct = receita.pct_change().dropna()
@@ -84,15 +130,17 @@ def calcular_indice_saude(df, rmse=None, preset="balanceado", pesos=None):
 
     # Erro relativo
     media = receita.mean()
-    erro_rel = 0.0 if (media == 0 or rmse is None) else rmse / media
+    if media == 0 or rmse is None:
+        erro_rel = 0.0
+    else:
+        erro_rel = rmse / media
 
     # --------------------------------------------------------------------------
-    # NORMALIZAÇÃO LOGÍSTICA
+    # NORMALIZAÇÃO
     # --------------------------------------------------------------------------
 
     score_growth = logistic_positive(growth, center=0.05, steepness=12)
     score_momentum = logistic_positive(momentum, center=0.05, steepness=12)
-
     score_vol = logistic_negative(vol, center=0.12, steepness=15)
     score_erro = logistic_negative(erro_rel, center=0.10, steepness=15)
 
@@ -108,8 +156,7 @@ def calcular_indice_saude(df, rmse=None, preset="balanceado", pesos=None):
     # --------------------------------------------------------------------------
 
     if pesos is not None:
-        if not np.isclose(sum(pesos.values()), 1.0):
-            raise ValueError("A soma dos pesos deve ser 1.")
+        _validar_pesos(pesos)
     else:
         if preset not in PESOS_PRESETS:
             raise ValueError("Preset inválido.")
@@ -119,10 +166,12 @@ def calcular_indice_saude(df, rmse=None, preset="balanceado", pesos=None):
     # ÍNDICE FINAL
     # --------------------------------------------------------------------------
 
-    indice = round(
-        sum(componentes[k] * pesos[k] for k in componentes),
-        2
-    )
+    indice = sum(componentes[k] * pesos[k] for k in componentes)
+
+    # Clamp (garantia de domínio)
+    indice = max(0.0, min(100.0, indice))
+
+    indice = round(indice, 2)
 
     return {
         "indice": float(indice),
@@ -136,6 +185,12 @@ def calcular_indice_saude(df, rmse=None, preset="balanceado", pesos=None):
 
 def classificar_saude(indice):
 
+    if not isinstance(indice, (int, float)):
+        raise ValueError("Índice inválido.")
+
+    if indice < 0 or indice > 100:
+        raise ValueError("Índice fora do intervalo esperado (0-100).")
+
     if indice < 40:
         return "Crítico"
     elif indice < 60:
@@ -144,14 +199,16 @@ def classificar_saude(indice):
         return "Saudável"
     else:
         return "Excelente"
+
+
 # ==============================================================================
 # RELATÓRIO AUTOMÁTICO
 # ==============================================================================
 
 def gerar_relatorio_saude(indice: float, classificacao: str, componentes: dict) -> str:
-    """
-    Gera relatório textual determinístico com base no índice e componentes.
-    """
+
+    if not isinstance(componentes, dict):
+        raise ValueError("Componentes inválidos.")
 
     crescimento = componentes.get("crescimento", 0)
     volatilidade = componentes.get("volatilidade", 0)
@@ -196,4 +253,3 @@ def gerar_relatorio_saude(indice: float, classificacao: str, componentes: dict) 
     )
 
     return relatorio
-
