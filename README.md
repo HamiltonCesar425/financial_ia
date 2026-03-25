@@ -1,8 +1,25 @@
 # Financial IA
 
-AI-driven financial health scoring system designed to evaluate financial conditions through quantitative indicators, simulation models and structured scoring logic.
+AI-driven financial health scoring system designed with production-grade architecture, including API layer, observability, containerization and simulation pipeline.
 
-The project combines financial metrics, scoring engines and simulation components to estimate a **financial health score** and classify financial conditions in a structured and extensible architecture.
+---
+
+## Security Notes
+
+This project uses a Python base image that may contain known vulnerabilities (1 critical, 1 high) identified by container scanning tools.
+
+Mitigations applied:
+
+- Updated base image to Debian Bookworm
+- Removed unnecessary dependencies
+- Rebuilt image with no cache
+
+These vulnerabilities are likely inherited from upstream system packages.
+
+For production usage:
+
+- Continuous image scanning is recommended
+- Integration with tools like Trivy or Snyk is advised
 
 ---
 
@@ -51,25 +68,42 @@ financial_ia/
 
 ---
 
-## Tech Stack
+## Architecture
 
-- Python 3.10
-- FastAPI
-- Pytest
-- Pytest-Cov
-- Docker
-- Prometheus (metrics instrumentation)
-- Grafana (monitoring dashboards)
+- FastAPI: ML inference API
+- Prometheus: metrics collection
+- Grafana: metrics visualization
+- Docker Compose: orchestration
+
+Flow:
+Client → API → Metrics → Prometheus → Grafana
 
 ---
 
-## Installation
+## API Example
 
-Clone the repository:
+### Request
 
-git clone https://github.com/HamiltonCesar425/financial_ia.git
+POST /score
 
-cd financial_ia
+```json
+{
+  "income": 5000,
+  "expenses": 3000,
+  "debts": 10000
+}
+```
+
+---
+
+## Response
+
+```json
+{
+  "health_score": 0.78,
+  "classification": "Good"
+}
+```
 
 ---
 
@@ -101,8 +135,21 @@ pip install -r requirements.txt
 
 pytest
 
-**Ececutar com cobertura**
-pytest --cov=src --cov-report=term-missing
+**Executar com cobertura**pytest --cov=src --cov-report=term-missing
+
+---
+
+## Run locally
+
+docker-compose up --build
+
+---
+
+## Metrics
+
+- request_count
+- request_latency
+- prediction_errors
 
 ---
 
@@ -110,7 +157,21 @@ pytest --cov=src --cov-report=term-missing
 
 The project includes instrumentation for metrics monitoring.
 
-Metrics can be collected using **Prometheus** and visualized through **Grafana dashboards**, enabling monitoring of model behavior and system performance.
+Metrics are exposed via `/metrics` endpoint using Prometheus client.
+
+Examples:
+
+- request_count_total
+- request_latency_seconds
+- prediction_errors_total
+
+---
+
+## Monitoring
+
+- Prometheushttp://localhost:9090
+
+- Grafanahttp://localhost:3000
 
 ---
 
