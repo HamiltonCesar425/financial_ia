@@ -1,14 +1,16 @@
+import os
 import time
-import src.services.prediction_service as prediction_service
+
 from fastapi import FastAPI, Response, HTTPException
 
-from prometheus_client import generate_latest
-from src.observability.http_metrics_middleware import PrometheusHTTPMiddleware
+import src.services.prediction_service as prediction_service
 
 from src.api.schemas import ReceitaInput, ScoreResponse
 from src.core.logging import setup_logging
 
+from prometheus_client import generate_latest
 
+from src.observability.http_metrics_middleware import PrometheusHTTPMiddleware
 from src.observability.metrics import (
     prediction_count,
     prediction_errors,
@@ -24,15 +26,14 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# 🔹 Ativa middleware de métricas somente se habilitado
+if os.getenv("ENABLE_METRICS", "true") == "true":
+    app.add_middleware(PrometheusHTTPMiddleware)
 
 # 🔹 Endpoint de métricas (Prometheus)
 @app.get("/metrics")
 def metrics():
     return Response(generate_latest(), media_type="text/plain")
-
-
-# 🔹 Middleware HTTP (responsável por métricas HTTP)
-app.add_middleware(PrometheusHTTPMiddleware)
 
 
 # 🔹 Endpoint principal
@@ -49,7 +50,7 @@ def financial_health_score(payload: ReceitaInput):
 
         return result
 
-    except Exception as e:
+    except Exception:
         logger.exception("Erro interno na predição")
 
         # 📊 Métricas de erro

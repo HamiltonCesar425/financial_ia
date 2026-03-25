@@ -1,0 +1,14 @@
+{
+  "score": 62.14811090318444,
+  "classification": "Regular",
+  "pillars": {
+    "crescimento": 79.34382500835571,
+    "estabilidade": 6.220788479043989,
+    "consistencia": 73.82573179033356,
+    "resiliencia": 91.66666666666667
+  },
+  "metadata": {
+    "window": 12,
+    "data_points": 12
+  }
+}
