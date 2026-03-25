@@ -1,20 +1,19 @@
 import time
-from fastapi import FastAPI, Response
+import src.services.prediction_service as prediction_service
+from fastapi import FastAPI, Response, HTTPException
 
 from prometheus_client import generate_latest
 from src.observability.http_metrics_middleware import PrometheusHTTPMiddleware
 
 from src.api.schemas import ReceitaInput, ScoreResponse
 from src.core.logging import setup_logging
-from src.services.prediction_service import predict as predict_service
+
 
 from src.observability.metrics import (
     prediction_count,
     prediction_errors,
     model_state_counter
 )
-
-print(">>> APP.PY REAL CARREGADO <<<")
 
 logger = setup_logging()
 logger.info("API inicializada")
@@ -24,6 +23,7 @@ app = FastAPI(
     description="API de avaliação de saúde financeira empresarial",
     version="1.0.0"
 )
+
 
 # 🔹 Endpoint de métricas (Prometheus)
 @app.get("/metrics")
@@ -37,19 +37,27 @@ app.add_middleware(PrometheusHTTPMiddleware)
 
 # 🔹 Endpoint principal
 @app.post("/financial-health-score", response_model=ScoreResponse)
-def financial_health_score(data: ReceitaInput):
+def financial_health_score(payload: ReceitaInput):
+    start_time = time.time()
 
     try:
-        # 🔹 Métrica de uso do modelo
-        model_state_counter.labels(state="inference").inc()
+        result = prediction_service.predict(payload.receita)
 
-        prediction = predict_service(data.receita)
-
+        # 📊 Métricas de sucesso
         prediction_count.inc()
+        model_state_counter.labels(state="success").inc()
 
-        return prediction
+        return result
 
-    except Exception:
+    except Exception as e:
+        logger.exception("Erro interno na predição")
+
+        # 📊 Métricas de erro
         prediction_errors.inc()
-        logger.exception("Erro durante predição")
-        raise
+        model_state_counter.labels(state="error").inc()
+
+        raise HTTPException(status_code=500, detail="Erro interno na predição")
+
+    finally:
+        elapsed = time.time() - start_time
+        logger.info(f"Tempo de execução: {elapsed:.4f}s")
