@@ -1,0 +1,4 @@
+# Testes
+pytest
+pytest-cov
+coverage
