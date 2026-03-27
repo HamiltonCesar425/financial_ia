@@ -1,7 +1,10 @@
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List, Dict, Any
+from typing import List
 
 
+# ==============================
+# INPUT - Série temporal (mantido)
+# ==============================
 class ReceitaInput(BaseModel):
     receita: List[float] = Field(
         ...,
@@ -23,23 +26,29 @@ class ReceitaInput(BaseModel):
     )
 
 
+# ==============================
+# INPUT - API de scoring (CORRETO)
+# ==============================
+class ScoreRequest(BaseModel):
+    renda: float = Field(..., gt=0, description="Renda mensal")
+    despesas: float = Field(..., ge=0, description="Despesas mensais")
+    divida: float = Field(..., ge=0, description="Dívida total")
+
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "renda": 5000,
+                "despesas": 3000,
+                "divida": 10000
+            }
+        }
+    )
+
+
+# ==============================
+# OUTPUT - API de scoring (PRODUTO)
+# ==============================
 class ScoreResponse(BaseModel):
-    score: float = Field(
-        ...,
-        ge=0,
-        le=100,
-        description="Score financeiro da empresa (0 a 100)"
-    )
-    classification: str = Field(
-        ...,
-        description="Classificação do risco financeiro"
-    )
-    pillars: Dict[str, float] = Field(
-        ...,
-        description="Indicadores que compõem o score"
-    )
-    metadata: Dict[str, Any] = Field(
-        default_factory=dict,
-        description="Informações adicionais do processamento"
-    )
-    
+    score: float = Field(..., description="Score financeiro calculado")
+    classificacao: str = Field(..., description="Classificação do perfil financeiro")
+    recomendacao: str = Field(..., description="Recomendação automática baseada no score")

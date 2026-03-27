@@ -1,56 +1,59 @@
 import numpy as np
 import pandas as pd
+from typing import Dict, Optional
 
 
 # ==============================================================================
 # PRESETS
 # ==============================================================================
 
-PESOS_PRESETS = {
+PESOS_PRESETS: Dict[str, Dict[str, float]] = {
     "balanceado": {
         "crescimento": 0.4,
         "volatilidade": 0.2,
         "momentum": 0.2,
-        "erro_modelo": 0.2
+        "erro_modelo": 0.2,
     },
     "conservador": {
         "crescimento": 0.25,
         "volatilidade": 0.35,
         "momentum": 0.15,
-        "erro_modelo": 0.25
+        "erro_modelo": 0.25,
     },
     "agressivo": {
         "crescimento": 0.45,
         "volatilidade": 0.15,
         "momentum": 0.20,
-        "erro_modelo": 0.20
-    }
+        "erro_modelo": 0.20,
+    },
 }
 
 
 # ==============================================================================
-# FUNÇÕES DE NORMALIZAÇÃO LOGÍSTICA
+# FUNÇÕES DE NORMALIZAÇÃO
 # ==============================================================================
 
-def logistic_positive(x, center=0.05, steepness=12):
-    """Maior é melhor"""
+def _safe_exp(x: float) -> float:
+    return np.exp(np.clip(x, -500, 500))
+
+
+def logistic_positive(x: float, center: float = 0.05, steepness: float = 12) -> float:
     x = np.nan_to_num(x, nan=0.0, posinf=1e6, neginf=-1e6)
-    return 100 / (1 + np.exp(-steepness * (x - center)))
+    return 100 / (1 + _safe_exp(-steepness * (x - center)))
 
 
-def logistic_negative(x, center=0.10, steepness=12):
-    """Menor é melhor"""
+def logistic_negative(x: float, center: float = 0.10, steepness: float = 12) -> float:
     x = np.nan_to_num(x, nan=0.0, posinf=1e6, neginf=-1e6)
-    return 100 / (1 + np.exp(steepness * (x - center)))
+    return 100 / (1 + _safe_exp(steepness * (x - center)))
 
 
 # ==============================================================================
-# VALIDAÇÕES AUXILIARES
+# VALIDAÇÕES
 # ==============================================================================
 
-def _validar_dataframe(df: pd.DataFrame):
-    if df is None or not isinstance(df, pd.DataFrame):
-        raise ValueError("Entrada deve ser um DataFrame válido.")
+def _validar_dataframe(df: pd.DataFrame) -> None:
+    if not isinstance(df, pd.DataFrame):
+        raise ValueError("Entrada deve ser um DataFrame.")
 
     if df.empty:
         raise ValueError("DataFrame não pode ser vazio.")
@@ -59,10 +62,10 @@ def _validar_dataframe(df: pd.DataFrame):
         raise ValueError("Coluna 'receita' obrigatória.")
 
     if df["receita"].isna().any():
-        raise ValueError("Dados contêm valores NaN na coluna 'receita'.")
+        raise ValueError("Valores NaN encontrados na coluna 'receita'.")
 
 
-def _validar_rmse(rmse):
+def _validar_rmse(rmse: Optional[float]) -> None:
     if rmse is None:
         return
 
@@ -76,7 +79,7 @@ def _validar_rmse(rmse):
         raise ValueError("RMSE não pode ser negativo.")
 
 
-def _validar_pesos(pesos: dict):
+def _validar_pesos(pesos: Dict[str, float]) -> None:
     if not isinstance(pesos, dict):
         raise ValueError("Pesos devem ser um dicionário.")
 
@@ -89,107 +92,143 @@ def _validar_pesos(pesos: dict):
 
 
 # ==============================================================================
-# FUNÇÃO PRINCIPAL
+# CORE PURO (SÉRIES)
 # ==============================================================================
 
-def calcular_indice_saude(df, rmse=None, preset="balanceado", pesos=None):
+def calcular_indice_saude_series(
+    receita: np.ndarray,
+    rmse: Optional[float] = None,
+    preset: str = "balanceado",
+    pesos: Optional[Dict[str, float]] = None,
+) -> Dict:
 
-    _validar_dataframe(df)
-    _validar_rmse(rmse)
+    if len(receita) == 0:
+        raise ValueError("Série de receita vazia.")
 
-    receita = df["receita"].astype(float)
+    receita = receita.astype(float)
 
-    # --------------------------------------------------------------------------
-    # MÉTRICAS BRUTAS
-    # --------------------------------------------------------------------------
+    # =========================
+    # MÉTRICAS
+    # =========================
 
-    # CAGR
     if len(receita) < 2:
         growth = 0.0
     else:
+        vi, vf = receita[0], receita[-1]
         n = len(receita) - 1
-        vi = receita.iloc[0]
-        vf = receita.iloc[-1]
+        growth = 0.0 if (vi <= 0 or vf <= 0) else (vf / vi) ** (1 / n) - 1
 
-        if vi <= 0 or vf <= 0:
-            growth = 0.0
-        else:
-            growth = (vf / vi) ** (1 / n) - 1
+    pct = np.diff(receita) / receita[:-1] if len(receita) > 1 else np.array([])
+    vol = np.std(pct[-6:]) if len(pct) > 0 else 0.0
 
-    # Volatilidade
-    pct = receita.pct_change().dropna()
-    vol = pct.tail(min(6, len(pct))).std(ddof=0) if len(pct) > 0 else 0.0
-
-    # Momentum
     if len(receita) < 3:
         momentum = 0.0
     else:
-        ma3 = receita.rolling(3).mean().iloc[-1]
-        ultimo = receita.iloc[-1]
-        momentum = 0.0 if ma3 == 0 else (ultimo - ma3) / ma3
+        ma3 = np.mean(receita[-3:])
+        momentum = 0.0 if ma3 == 0 else (receita[-1] - ma3) / ma3
 
-    # Erro relativo
-    media = receita.mean()
-    if media == 0 or rmse is None:
-        erro_rel = 0.0
-    else:
-        erro_rel = rmse / media
+    media = np.mean(receita)
+    erro_rel = 0.0 if (media == 0 or rmse is None) else rmse / media
 
-    # --------------------------------------------------------------------------
+    # =========================
     # NORMALIZAÇÃO
-    # --------------------------------------------------------------------------
-
-    score_growth = logistic_positive(growth, center=0.05, steepness=12)
-    score_momentum = logistic_positive(momentum, center=0.05, steepness=12)
-    score_vol = logistic_negative(vol, center=0.12, steepness=15)
-    score_erro = logistic_negative(erro_rel, center=0.10, steepness=15)
+    # =========================
 
     componentes = {
-        "crescimento": round(float(score_growth), 2),
-        "volatilidade": round(float(score_vol), 2),
-        "momentum": round(float(score_momentum), 2),
-        "erro_modelo": round(float(score_erro), 2)
+        "crescimento": float(logistic_positive(growth)),
+        "volatilidade": float(logistic_negative(vol, center=0.12, steepness=15)),
+        "momentum": float(logistic_positive(momentum)),
+        "erro_modelo": float(logistic_negative(erro_rel, steepness=15)),
     }
 
-    # --------------------------------------------------------------------------
+    # =========================
     # PESOS
-    # --------------------------------------------------------------------------
+    # =========================
 
-    if pesos is not None:
+    if pesos:
         _validar_pesos(pesos)
     else:
         if preset not in PESOS_PRESETS:
             raise ValueError("Preset inválido.")
         pesos = PESOS_PRESETS[preset]
 
-    # --------------------------------------------------------------------------
-    # ÍNDICE FINAL
-    # --------------------------------------------------------------------------
+    # =========================
+    # SCORE FINAL
+    # =========================
 
     indice = sum(componentes[k] * pesos[k] for k in componentes)
-
-    # Clamp (garantia de domínio)
-    indice = max(0.0, min(100.0, indice))
-
-    indice = round(indice, 2)
+    indice = float(np.clip(indice, 0.0, 100.0))
 
     return {
-        "indice": float(indice),
-        "componentes": componentes
+        "indice": round(indice, 2),
+        "componentes": {k: round(v, 2) for k, v in componentes.items()},
     }
+
+
+# ==============================================================================
+# WRAPPER DATAFRAME
+# ==============================================================================
+
+def calcular_indice_saude(
+    df: pd.DataFrame,
+    rmse: Optional[float] = None,
+    preset: str = "balanceado",
+    pesos: Optional[Dict[str, float]] = None,
+) -> Dict:
+
+    _validar_dataframe(df)
+    _validar_rmse(rmse)
+
+    return calcular_indice_saude_series(
+        receita=df["receita"].values,
+        rmse=rmse,
+        preset=preset,
+        pesos=pesos,
+    )
+
+
+# ==============================================================================
+# FUNÇÃO SIMPLES (CRÍTICA PARA API E TESTES)
+# ==============================================================================
+
+def calcular_indice_saude_input_simples(
+    renda: float,
+    despesas: float,
+    divida: float
+) -> float:
+    """
+    Interface pública simplificada (OBRIGATÓRIA).
+    """
+
+    # =========================
+    # VALIDAÇÕES
+    # =========================
+    if renda <= 0:
+        raise ValueError("Renda deve ser maior que zero.")
+
+    if despesas < 0 or divida < 0:
+        raise ValueError("Valores não podem ser negativos.")
+
+    # =========================
+    # REGRA DETERMINÍSTICA
+    # =========================
+    comprometimento = (despesas + divida) / renda
+
+    score = 100 * (1 - comprometimento)
+
+    return float(np.clip(score, 0.0, 100.0))
 
 
 # ==============================================================================
 # CLASSIFICAÇÃO
 # ==============================================================================
 
-def classificar_saude(indice):
-
+def classificar_saude(indice: float) -> str:
     if not isinstance(indice, (int, float)):
         raise ValueError("Índice inválido.")
 
-    if indice < 0 or indice > 100:
-        raise ValueError("Índice fora do intervalo esperado (0-100).")
+    if not (0 <= indice <= 100):
+        raise ValueError("Índice fora do intervalo (0-100).")
 
     if indice < 40:
         return "Crítico"
@@ -197,59 +236,23 @@ def classificar_saude(indice):
         return "Instável"
     elif indice < 75:
         return "Saudável"
-    else:
-        return "Excelente"
+    return "Excelente"
 
 
 # ==============================================================================
-# RELATÓRIO AUTOMÁTICO
+# RELATÓRIO
 # ==============================================================================
 
-def gerar_relatorio_saude(indice: float, classificacao: str, componentes: dict) -> str:
+def gerar_relatorio_saude(
+    indice: float,
+    classificacao: str,
+    componentes: Dict[str, float],
+) -> str:
 
     if not isinstance(componentes, dict):
         raise ValueError("Componentes inválidos.")
 
-    crescimento = componentes.get("crescimento", 0)
-    volatilidade = componentes.get("volatilidade", 0)
-    momentum = componentes.get("momentum", 0)
-    erro_modelo = componentes.get("erro_modelo", 0)
-
-    pontos_fortes = []
-    pontos_fracos = []
-
-    if crescimento >= 60:
-        pontos_fortes.append("Crescimento consistente da receita")
-    else:
-        pontos_fracos.append("Crescimento abaixo do ideal")
-
-    if volatilidade >= 60:
-        pontos_fortes.append("Baixa volatilidade recente")
-    else:
-        pontos_fracos.append("Oscilação elevada nas receitas")
-
-    if momentum >= 60:
-        pontos_fortes.append("Momentum positivo no curto prazo")
-    else:
-        pontos_fracos.append("Perda de tração recente")
-
-    if erro_modelo >= 60:
-        pontos_fortes.append("Boa previsibilidade do modelo")
-    else:
-        pontos_fracos.append("Incerteza elevada nas previsões")
-
-    relatorio = (
-        f"Diagnóstico Financeiro\n\n"
-        f"Índice Geral: {indice} ({classificacao})\n\n"
-        f"Análise:\n\n"
-        f"Pontos Fortes:\n"
-        f"- " + ("\n- ".join(pontos_fortes) if pontos_fortes else "Nenhum destaque relevante.") + "\n\n"
-        f"Pontos de Atenção:\n"
-        f"- " + ("\n- ".join(pontos_fracos) if pontos_fracos else "Nenhum risco significativo identificado.") + "\n\n"
-        f"Conclusão:\n"
-        f"O cenário atual é classificado como '{classificacao}'. "
-        f"Recomenda-se monitoramento contínuo dos componentes com menor pontuação "
-        f"para fortalecimento estrutural da saúde financeira."
-    )
+    relatorio = "Diagnóstico Financeiro\n\n"
+    relatorio += f"Índice: {indice} ({classificacao})\n\n"
 
     return relatorio
