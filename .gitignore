@@ -1,6 +1,9 @@
 # Python cache
 __pycache__/
 *.pyc
+*.Pyo
+*pyd
+
 
 # Pytest
 .pytest_cache/
@@ -10,3 +13,4 @@ __pycache__/
 
 # OS
 .DS_Store
+*.coverage
