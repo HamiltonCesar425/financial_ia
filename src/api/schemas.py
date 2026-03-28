@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from typing import List, Optional
 
 
 # ==============================
@@ -30,19 +30,14 @@ class ReceitaInput(BaseModel):
 # INPUT - API de scoring (CORRETO)
 # ==============================
 class ScoreRequest(BaseModel):
-    renda: float = Field(..., gt=0, description="Renda mensal")
-    despesas: float = Field(..., ge=0, description="Despesas mensais")
-    divida: float = Field(..., ge=0, description="Dívida total")
+    # modo simples
+    renda: Optional[float] = None
+    despesas: Optional[float] = None
+    divida: Optional[float] = None
 
-    model_config = ConfigDict(
-        json_schema_extra={
-            "example": {
-                "renda": 5000,
-                "despesas": 3000,
-                "divida": 10000
-            }
-        }
-    )
+    # modo série
+    data: Optional[List[float]] = None
+    window: Optional[int] = None
 
 
 # ==============================

@@ -1,10 +1,14 @@
 import os
 import time
+import pandas as pd
 
 from fastapi import FastAPI, Response, HTTPException
 from prometheus_client import generate_latest
 
-from src.core.health_score import calcular_indice_saude_input_simples
+from src.core.health_score import (
+    calcular_indice_saude_input_simples,
+    calcular_indice_saude,
+)
 from src.api.schemas import ScoreResponse, ScoreRequest
 from src.core.logging import setup_logging
 from src.observability.http_metrics_middleware import PrometheusHTTPMiddleware
@@ -52,7 +56,7 @@ def metrics():
 
 
 # ======================================
-# Lógica de classificação (mantida na API agora)
+# Lógica de classificação
 # ======================================
 def _classificar(score: float) -> str:
     if score >= 80:
@@ -75,19 +79,31 @@ def _gerar_recomendacao(score: float) -> str:
 
 
 # ======================================
-# Endpoint principal
+# Endpoint principal (CORRIGIDO)
 # ======================================
 @app.post("/score", response_model=ScoreResponse)
 def calcular_score(payload: ScoreRequest) -> ScoreResponse:
     start_time = time.time()
 
     try:
-        score = calcular_indice_saude_input_simples(
-            renda=payload.renda,
-            despesas=payload.despesas,
-            divida=payload.divida,
-        )
+        # =========================
+        # DECISÃO BASEADA NO SCHEMA (CORRETO)
+        # =========================
+        if payload.data is not None:
+            df = pd.DataFrame({"receita": payload.data})
+            result = calcular_indice_saude(df)
+            score = result["indice"]
 
+        else:
+            score = calcular_indice_saude_input_simples(
+                renda=payload.renda,
+                despesas=payload.despesas,
+                divida=payload.divida,
+            )
+
+        # =========================
+        # CLASSIFICAÇÃO
+        # =========================
         classificacao = _classificar(score)
         recomendacao = _gerar_recomendacao(score)
 
