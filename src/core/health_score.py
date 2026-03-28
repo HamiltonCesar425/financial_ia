@@ -61,9 +61,6 @@ def _validar_dataframe(df: pd.DataFrame) -> None:
     if "receita" not in df.columns:
         raise ValueError("Coluna 'receita' obrigatória.")
 
-    if df["receita"].isna().any():
-        raise ValueError("Valores NaN encontrados na coluna 'receita'.")
-
 
 def _validar_rmse(rmse: Optional[float]) -> None:
     if rmse is None:
@@ -108,9 +105,15 @@ def calcular_indice_saude_series(
     receita = receita.astype(float)
 
     # =========================
+    # SANITIZAÇÃO GLOBAL
+    # =========================
+    receita = np.nan_to_num(receita, nan=0.0, posinf=1e6, neginf=-1e6)
+
+    # =========================
     # MÉTRICAS
     # =========================
 
+    # Crescimento (CAGR simplificado)
     if len(receita) < 2:
         growth = 0.0
     else:
@@ -118,17 +121,31 @@ def calcular_indice_saude_series(
         n = len(receita) - 1
         growth = 0.0 if (vi <= 0 or vf <= 0) else (vf / vi) ** (1 / n) - 1
 
-    pct = np.diff(receita) / receita[:-1] if len(receita) > 1 else np.array([])
-    vol = np.std(pct[-6:]) if len(pct) > 0 else 0.0
+    # Variação percentual (robusta)
+    if len(receita) > 1:
+        denominator = receita[:-1]
+        denominator = np.where(denominator == 0, 1e-8, denominator)
 
+        pct = np.diff(receita) / denominator
+        pct = np.nan_to_num(pct, nan=0.0, posinf=0.0, neginf=0.0)
+
+        vol = np.std(pct[-6:]) if len(pct) > 0 else 0.0
+    else:
+        vol = 0.0
+
+    # Momentum
     if len(receita) < 3:
         momentum = 0.0
     else:
         ma3 = np.mean(receita[-3:])
-        momentum = 0.0 if ma3 == 0 else (receita[-1] - ma3) / ma3
+        momentum = 0.0 if abs(ma3) < 1e-8 else (receita[-1] - ma3) / ma3
 
+    # Erro relativo
     media = np.mean(receita)
-    erro_rel = 0.0 if (media == 0 or rmse is None) else rmse / media
+    media = media if abs(media) > 1e-8 else 1e-8
+
+    erro_rel = 0.0 if rmse is None else rmse / media
+    erro_rel = float(np.clip(erro_rel, 0.0, 1e6))
 
     # =========================
     # NORMALIZAÇÃO
@@ -188,7 +205,7 @@ def calcular_indice_saude(
 
 
 # ==============================================================================
-# FUNÇÃO SIMPLES (CRÍTICA PARA API E TESTES)
+# FUNÇÃO SIMPLES (API)
 # ==============================================================================
 
 def calcular_indice_saude_input_simples(
@@ -196,24 +213,14 @@ def calcular_indice_saude_input_simples(
     despesas: float,
     divida: float
 ) -> float:
-    """
-    Interface pública simplificada (OBRIGATÓRIA).
-    """
 
-    # =========================
-    # VALIDAÇÕES
-    # =========================
     if renda <= 0:
         raise ValueError("Renda deve ser maior que zero.")
 
     if despesas < 0 or divida < 0:
         raise ValueError("Valores não podem ser negativos.")
 
-    # =========================
-    # REGRA DETERMINÍSTICA
-    # =========================
     comprometimento = (despesas + divida) / renda
-
     score = 100 * (1 - comprometimento)
 
     return float(np.clip(score, 0.0, 100.0))
