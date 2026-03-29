@@ -1,17 +1,12 @@
-import os
 import time
-import pandas as pd
+import os
 
-from fastapi import FastAPI, Response, HTTPException
+from fastapi import APIRouter, Response, HTTPException
 from prometheus_client import generate_latest
 
-from src.core.health_score import (
-    calcular_indice_saude_input_simples,
-    calcular_indice_saude,
-)
+from src.core.health_score import calcular_indice_saude_input_simples
 from src.api.schemas import ScoreResponse, ScoreRequest
 from src.core.logging import setup_logging
-from src.observability.http_metrics_middleware import PrometheusHTTPMiddleware
 from src.observability.metrics import (
     prediction_count,
     prediction_errors,
@@ -22,35 +17,25 @@ from src.observability.metrics import (
 # Logging
 # ======================================
 logger = setup_logging()
-logger.info("API inicializada")
-
+logger.info("Router de API inicializado")
 
 # ======================================
-# App Initialization
+# Router Initialization
 # ======================================
-app = FastAPI(
-    title="Financial IA API",
-    description="API de avaliação de saúde financeira com classificação e recomendação automática",
-    version="1.0.0",
+router = APIRouter(
+    prefix="", tags=["Financial IA"]  # pode usar "/api" se quiser agrupar
 )
-
-
-# ======================================
-# Middleware (Observabilidade)
-# ======================================
-if os.getenv("ENABLE_METRICS", "true").lower() == "true":
-    app.add_middleware(PrometheusHTTPMiddleware)
 
 
 # ======================================
 # Endpoints auxiliares
 # ======================================
-@app.get("/health")
+@router.get("/health")
 def health_check():
     return {"status": "ok"}
 
 
-@app.get("/metrics")
+@router.get("/metrics")
 def metrics():
     return Response(generate_latest(), media_type="text/plain")
 
@@ -79,31 +64,19 @@ def _gerar_recomendacao(score: float) -> str:
 
 
 # ======================================
-# Endpoint principal (CORRIGIDO)
+# Endpoint principal
 # ======================================
-@app.post("/score", response_model=ScoreResponse)
+@router.post("/score", response_model=ScoreResponse)
 def calcular_score(payload: ScoreRequest) -> ScoreResponse:
     start_time = time.time()
 
     try:
-        # =========================
-        # DECISÃO BASEADA NO SCHEMA (CORRETO)
-        # =========================
-        if payload.data is not None:
-            df = pd.DataFrame({"receita": payload.data})
-            result = calcular_indice_saude(df)
-            score = result["indice"]
+        score = calcular_indice_saude_input_simples(
+            receita=payload.receita,
+            despesas=payload.despesas,
+            divida=payload.divida,
+        )
 
-        else:
-            score = calcular_indice_saude_input_simples(
-                renda=payload.renda,
-                despesas=payload.despesas,
-                divida=payload.divida,
-            )
-
-        # =========================
-        # CLASSIFICAÇÃO
-        # =========================
         classificacao = _classificar(score)
         recomendacao = _gerar_recomendacao(score)
 
@@ -111,25 +84,18 @@ def calcular_score(payload: ScoreRequest) -> ScoreResponse:
         model_state_counter.labels(state="success").inc()
 
         return ScoreResponse(
-            score=round(score, 2),
+            score=float(round(score, 2)),
             classificacao=classificacao,
             recomendacao=recomendacao,
         )
 
-    except ValueError as exc:
-        logger.warning("Erro de validação: %s", str(exc))
-        raise HTTPException(status_code=400, detail=str(exc)) from exc
+   
 
     except Exception as exc:
         logger.exception("Erro interno na predição")
-
         prediction_errors.inc()
         model_state_counter.labels(state="error").inc()
-
-        raise HTTPException(
-            status_code=500,
-            detail="Erro interno na predição",
-        ) from exc
+        raise HTTPException(status_code=500, detail="Erro interno na predição") from exc
 
     finally:
         elapsed = time.time() - start_time

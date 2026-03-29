@@ -209,18 +209,18 @@ def calcular_indice_saude(
 # ==============================================================================
 
 def calcular_indice_saude_input_simples(
-    renda: float,
+    receita: float,
     despesas: float,
     divida: float
 ) -> float:
 
-    if renda <= 0:
+    if receita <= 0:
         raise ValueError("Renda deve ser maior que zero.")
 
     if despesas < 0 or divida < 0:
         raise ValueError("Valores não podem ser negativos.")
 
-    comprometimento = (despesas + divida) / renda
+    comprometimento = (despesas + divida) / receita
     score = 100 * (1 - comprometimento)
 
     return float(np.clip(score, 0.0, 100.0))

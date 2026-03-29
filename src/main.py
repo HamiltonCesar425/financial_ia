@@ -1,34 +1,17 @@
-import pandas as pd
+from fastapi import FastAPI
+from src.api.app import router
+from src.observability.http_metrics_middleware import PrometheusHTTPMiddleware
+import os
 
-from engine.calculation_engine import FinancialHealthEngine
-from src.simulation.simulator import gerar_cenario
+app = FastAPI(
+    title="Financial IA API",
+    description="API de avaliação de saúde financeira com classificação e recomendação automática",
+    version="1.0.0",
+)
 
+# Middleware de métricas
+if os.getenv("ENABLE_METRICS", "true").lower() == "true":
+    app.add_middleware(PrometheusHTTPMiddleware)
 
-def main():
-
-    df = gerar_cenario(
-        meses=36,
-        receita_inicial=20000,
-        receita_final=50000,
-        volatilidade=2000,
-        seed=42
-    )
-
-    engine = FinancialHealthEngine(window=12)
-
-    resultado = engine.compute(df)
-
-    print("\n===== FINANCIAL HEALTH SCORE =====\n")
-
-    print("Score:", resultado["score"])
-    print("Classificação:", resultado["classification"])
-
-    print("\nPilares:")
-
-    for k, v in resultado["pillars"].items():
-        print(f"{k}: {v:.2f}")
-
-
-if __name__ == "__main__":
-    main()
-
+# Inclui o router
+app.include_router(router)
