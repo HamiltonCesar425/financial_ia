@@ -1,9 +1,9 @@
 #</> YAML
 global:
-  scrape_interval: 5s
+  scrape_interval: 15s
 
 scrape_configs:
-  - job_name: "financial_ia_api"
+  - job_name: "financial_ia"
 
     static_configs:
-      - targets: ["api:8000"]
+      - targets: ["app:8000"]

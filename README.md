@@ -1,219 +1,107 @@
 # Financial IA
 
-AI-driven financial health scoring system designed with production-grade architecture, including API layer, observability, containerization and simulation pipeline.
+API em **FastAPI** para análise financeira, com observabilidade integrada via **Prometheus** e **Grafana**.
 
 ---
 
-## Security Notes
+## 🚀 Como subir os containers
 
-This project uses a Python base image that may contain known vulnerabilities (1 critical, 1 high) identified by container scanning tools.
+Para iniciar todos os serviços (API, Prometheus e Grafana), execute:
 
-Mitigations applied:
-
-- Updated base image to Debian Bookworm
-- Removed unnecessary dependencies
-- Rebuilt image with no cache
-
-These vulnerabilities are likely inherited from upstream system packages.
-
-For production usage:
-
-- Continuous image scanning is recommended
-- Integration with tools like Trivy or Snyk is advised
-
----
-
-![Python](https://img.shields.io/badge/Python-3.10-blue)
-
-![Tests](https://img.shields.io/badge/tests-pytest-green)
-
-![Coverage](https://img.shields.io/badge/coverage-22%25-orange)
-
-![License](https://img.shields.io/badge/license-MIT-blue)
-
----
-
-## Features
-
-- Financial health scoring algorithm
-- Modular financial metrics engine
-- Pillar-based scoring architecture
-- Simulation engine for financial scenarios
-- REST API for score calculation
-- Observability with metrics instrumentation
-- Automated test suite with pytest
-
----
-
-## Project Architecture
-
-financial_ia/
-│
-├── src/
-│   ├── api/                # REST API layer
-│   ├── core/               # Core scoring logic
-│   ├── engine/             # Financial calculation engine
-│   ├── simulation/         # Scenario simulation
-│   ├── observability/      # Metrics and logging
-│   ├── main.py             # Application entrypoint
-│   └── __version__.py
-│
-├── tests/                  # Test suite
-│
-├── Dockerfile
-├── docker-compose.yml
-├── pytest.ini
-├── requirements.txt
-└── README.md
-
----
-
-## Architecture
-
-- FastAPI: ML inference API
-- Prometheus: metrics collection
-- Grafana: metrics visualization
-- Docker Compose: orchestration
-
-Flow:
-Client → API → Metrics → Prometheus → Grafana
-
----
----
-
-## 🧪 Testing Quality and Coverage
-
-This project was developed with a strong focus on robustness and reliability.
-It currently includes more than 100 automated tests covering success cases, failure scenarios, and edge conditions.
-
-Overall coverage: ~90%
-
-Critical modules (engine, observability, schemas) reach 100% coverage
-
-Test suite highlights:
-
-Input validation and expected error handling
-
-Edge cases (insufficient data, extreme values)
-
-Full calculation and classification flows
-
-The goal was not to chase 100% coverage at any cost, but to ensure that all relevant and realistic paths of the system are thoroughly tested. This demonstrates technical maturity and practical concern for quality, avoiding artificial tests created solely to inflate numbers.
-
----
----
-
-## API Example
-
-### Request
-
-POST /score
-
-```json
-{
-  "income": 5000,
-  "expenses": 3000,
-  "debts": 10000
-}
-```
-
----
-
-## Response
-
-```json
-{
-  "health_score": 0.78,
-  "classification": "Good"
-}
-```
-
----
-
-## Create virtual environment
-
-python -m venv .venv
-
----
-
-## Activate the virtual environment on Windows
-
-.venv/Scripts/activate
-
----
-
-## Linux/macOS
-
-source .venv/bin/activate
-
----
-
-## Install dependencies
-
-pip install -r requirements.txt
-
----
-
-## Running Tests
-
-pytest
-
-**Run with coverage**pytest --cov=src --cov-report=term-missing
-
----
-
-## Run locally
-
+```bash
 docker-compose up --build
+```
 
 ---
 
-## Metrics
+Isso vai construir as imagens e subir os containers definidos no docker-compose.yml.
 
-- request_count
-- request_latency
-- prediction_errors
+---
+---
+
+## 📊 Acessando os serviços
+
+. API FastAPI
+
+  . Documentação: ```http://localhost:8000/docs```
+
+  . Health check: ``http://localhost:8000/health``
+
+  . Métricas Prometheus: ``http://localhost:8000/metrics``
+
+---
+. Prometheus
+
+  . Interface: ``http://localhost:9090``
+
+  . Targets: ``http://localhost:9090/targets``
+
+---
+. Grafana
+
+  . Interface: ``http://localhost:3000``
+
+  . Usuário padrão: admin
+
+  . Senha padrão: admin (solicita alteração no primeiro login)
 
 ---
 
-## Observability
+## 📈 Importando dashboards no Grafana
 
-The project includes instrumentation for metrics monitoring.
+1. Acesse o Grafana em ``http://localhost:3000.``
 
-Metrics are exposed via `/metrics` endpoint using Prometheus client.
+2. Vá em Dashboards → Import.
 
-Examples:
+3. Cole o JSON do dashboard customizado (exemplo abaixo) ou faça      upload do arquivo .json.
 
-- request_count_total
-- request_latency_seconds
-- prediction_errors_total
+4. Selecione o data source Prometheus.
 
----
-
-## Monitoring
-
-- Prometheushttp://localhost:9090
-
-- Grafanahttp://localhost:3000
+5. Clique em Import.
 
 ---
 
-## Roadmap
+## 🖼️ Exemplo de JSON de dashboard
 
-Planned improvements:
+```json
+{
+  "title": "Financial IA Dashboard",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Total de Predições",
+      "targets": [{ "expr": "prediction_total" }],
+      "gridPos": { "x": 0, "y": 0, "w": 8, "h": 6 }
+    },
+    {
+      "type": "stat",
+      "title": "Erros de Predição",
+      "targets": [{ "expr": "prediction_errors_total" }],
+      "gridPos": { "x": 8, "y": 0, "w": 8, "h": 6 }
+    },
+    {
+      "type": "barchart",
+      "title": "Estado do Modelo",
+      "targets": [{ "expr": "model_state_total" }],
+      "gridPos": { "x": 0, "y": 6, "w": 16, "h": 8 }
+    }
+  ]
+}
+```
 
-- Expand test coverage across engine modules
-- Implement full Grafana dashboards
-- Add backtesting module
-- CI/CD pipeline integration
-- Cloud deployment
-  
+---
 ---
 
-## Project Status
+## ✅ Resultado esperado
 
-Active development.
+. Após importar o dashboard, você terá:
 
-The current version includes the core scoring engine, simulation components, API structure and initial test suite.
+. Total de predições realizadas
+
+. Número de erros de predição
+
+. Estado do modelo (sucesso vs erro)
+
+. Latência e métricas de requisições (se adicionar painéis extras)
 
 ---

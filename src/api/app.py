@@ -13,6 +13,7 @@ from src.observability.metrics import (
     model_state_counter,
 )
 
+
 # ======================================
 # Logging
 # ======================================
