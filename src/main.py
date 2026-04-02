@@ -1,5 +1,6 @@
 import os
 from fastapi import FastAPI
+
 from prometheus_fastapi_instrumentator import Instrumentator
 from src.api.app import router
 from src.observability.http_metrics_middleware import PrometheusHTTPMiddleware

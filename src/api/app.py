@@ -1,8 +1,14 @@
 import time
 import os
 
-from fastapi import APIRouter, Response, HTTPException
+from pydantic import BaseModel
+from fastapi import FastAPI, APIRouter, Response, HTTPException
+
+from prometheus_fastapi_instrumentator import Instrumentator
 from prometheus_client import generate_latest
+
+# Importa métricas customizadas
+from .metrics import receita_metric, despesas_metric, divida_metric
 
 from src.core.health_score import calcular_indice_saude_input_simples
 from src.api.schemas import ScoreResponse, ScoreRequest
@@ -13,7 +19,6 @@ from src.observability.metrics import (
     model_state_counter,
 )
 
-
 # ======================================
 # Logging
 # ======================================
@@ -21,11 +26,15 @@ logger = setup_logging()
 logger.info("Router de API inicializado")
 
 # ======================================
-# Router Initialization
+# App + Router Initialization
 # ======================================
+app = FastAPI(title="Financial AI")
 router = APIRouter(
-    prefix="", tags=["Financial IA"]  # pode usar "/api" se quiser agrupar
-)
+    prefix="", tags=["Financial IA"]
+)  # pode usar "/api" se quiser agrupar
+
+# Expor métricas padrão do FastAPI
+Instrumentator().instrument(app).expose(app)
 
 
 # ======================================
@@ -72,6 +81,12 @@ def calcular_score(payload: ScoreRequest) -> ScoreResponse:
     start_time = time.time()
 
     try:
+        # Atualiza métricas customizadas
+        receita_metric.set(payload.receita)
+        despesas_metric.set(payload.despesas)
+        divida_metric.set(payload.divida)
+
+        # Lógica de cálculo
         score = calcular_indice_saude_input_simples(
             receita=payload.receita,
             despesas=payload.despesas,
@@ -90,8 +105,6 @@ def calcular_score(payload: ScoreRequest) -> ScoreResponse:
             recomendacao=recomendacao,
         )
 
-   
-
     except Exception as exc:
         logger.exception("Erro interno na predição")
         prediction_errors.inc()
@@ -101,3 +114,9 @@ def calcular_score(payload: ScoreRequest) -> ScoreResponse:
     finally:
         elapsed = time.time() - start_time
         logger.info("Tempo de execução: %.4fs", elapsed)
+
+
+# ======================================
+# Inclui router no app
+# ======================================
+app.include_router(router)
