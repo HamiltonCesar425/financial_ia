@@ -8,7 +8,13 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from prometheus_client import generate_latest
 
 # Importa métricas customizadas
-from .metrics import receita_metric, despesas_metric, divida_metric
+from .metrics import (  # noqa: F401
+    receita_metric,
+    despesas_metric,
+    divida_metric,
+    classificacao_metric,
+    recomendacao_metric,
+)
 
 from src.core.health_score import calcular_indice_saude_input_simples
 from src.api.schemas import ScoreResponse, ScoreRequest
@@ -95,6 +101,13 @@ def calcular_score(payload: ScoreRequest) -> ScoreResponse:
 
         classificacao = _classificar(score)
         recomendacao = _gerar_recomendacao(score)
+
+        # Atualiza métricas de classificação e recomendação
+        classificacao_map = {"Saudável": 1, "Estável": 2, "Risco": 3, "Crítico": 4}
+        classificacao_metric.set(classificacao_map[classificacao])
+
+        # PAra recomendação, usar um hash simples para diferenciar
+        recomendacao_metric.set(abs(hash(recomendacao)) % 1000)
 
         prediction_count.inc()
         model_state_counter.labels(state="success").inc()

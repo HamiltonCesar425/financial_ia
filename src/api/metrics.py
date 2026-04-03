@@ -6,3 +6,6 @@ receita_metric = Gauge("financial_ai_receita", "Receita da empresa")
 despesas_metric = Gauge("financial_ai_despesas", "Despesas da empresa")
 divida_metric = Gauge("financial_ai_divida", "Dívida da empresa")
 
+# Novas métricas
+classificacao_metric = Gauge("financial_ai_classificacao", "Classificação financeira")
+recomendacao_metric = Gauge("financial_ai_recomendacao", "Recomendação financeira")
