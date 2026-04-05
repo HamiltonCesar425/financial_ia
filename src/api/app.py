@@ -1,14 +1,10 @@
 import time
-import os
-
-from pydantic import BaseModel
 from fastapi import FastAPI, APIRouter, Response, HTTPException
-
 from prometheus_fastapi_instrumentator import Instrumentator
 from prometheus_client import generate_latest
 
 # Importa métricas customizadas
-from .metrics import (  # noqa: F401
+from src.api.metrics import (
     receita_metric,
     despesas_metric,
     divida_metric,
@@ -35,11 +31,9 @@ logger.info("Router de API inicializado")
 # App + Router Initialization
 # ======================================
 app = FastAPI(title="Financial AI")
-router = APIRouter(
-    prefix="", tags=["Financial IA"]
-)  # pode usar "/api" se quiser agrupar
+router = APIRouter(prefix="", tags=["Financial IA"])
 
-# Expor métricas padrão do FastAPI
+# Expor métricas padrão do FastAPI + customizadas
 Instrumentator().instrument(app).expose(app)
 
 
@@ -106,9 +100,9 @@ def calcular_score(payload: ScoreRequest) -> ScoreResponse:
         classificacao_map = {"Saudável": 1, "Estável": 2, "Risco": 3, "Crítico": 4}
         classificacao_metric.set(classificacao_map[classificacao])
 
-        # PAra recomendação, usar um hash simples para diferenciar
         recomendacao_metric.set(abs(hash(recomendacao)) % 1000)
 
+        # Métricas de observabilidade
         prediction_count.inc()
         model_state_counter.labels(state="success").inc()
 
