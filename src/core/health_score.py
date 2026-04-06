@@ -33,6 +33,7 @@ PESOS_PRESETS: Dict[str, Dict[str, float]] = {
 # FUNÇÕES DE NORMALIZAÇÃO
 # ==============================================================================
 
+
 def _safe_exp(x: float) -> float:
     return np.exp(np.clip(x, -500, 500))
 
@@ -50,6 +51,7 @@ def logistic_negative(x: float, center: float = 0.10, steepness: float = 12) -> 
 # ==============================================================================
 # VALIDAÇÕES
 # ==============================================================================
+
 
 def _validar_dataframe(df: pd.DataFrame) -> None:
     if not isinstance(df, pd.DataFrame):
@@ -88,9 +90,22 @@ def _validar_pesos(pesos: Dict[str, float]) -> None:
             raise ValueError(f"Peso ausente: {k}")
 
 
+def calcular(dados):
+    if not dados:
+        raise ValueError("Dados vazios")
+    receitas = dados.get("receitas", 0)
+    despesas = dados.get("despesas", 0)
+    volatilidade = dados.get("volatilidade", 0)
+    score = max(0, receitas - despesas)
+    if volatilidade > 0.8:
+        score = min(score, 100)
+    return score
+
+
 # ==============================================================================
 # CORE PURO (SÉRIES)
 # ==============================================================================
+
 
 def calcular_indice_saude_series(
     receita: np.ndarray,
@@ -186,6 +201,7 @@ def calcular_indice_saude_series(
 # WRAPPER DATAFRAME
 # ==============================================================================
 
+
 def calcular_indice_saude(
     df: pd.DataFrame,
     rmse: Optional[float] = None,
@@ -208,10 +224,9 @@ def calcular_indice_saude(
 # FUNÇÃO SIMPLES (API)
 # ==============================================================================
 
+
 def calcular_indice_saude_input_simples(
-    receita: float,
-    despesas: float,
-    divida: float
+    receita: float, despesas: float, divida: float
 ) -> float:
 
     if receita <= 0:
@@ -229,6 +244,7 @@ def calcular_indice_saude_input_simples(
 # ==============================================================================
 # CLASSIFICAÇÃO
 # ==============================================================================
+
 
 def classificar_saude(indice: float) -> str:
     if not isinstance(indice, (int, float)):
@@ -249,6 +265,7 @@ def classificar_saude(indice: float) -> str:
 # ==============================================================================
 # RELATÓRIO
 # ==============================================================================
+
 
 def gerar_relatorio_saude(
     indice: float,

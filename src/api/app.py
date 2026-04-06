@@ -1,5 +1,5 @@
 import time
-from fastapi import FastAPI, APIRouter, Response, HTTPException
+from fastapi import FastAPI, APIRouter, Response, HTTPException, Request
 from prometheus_fastapi_instrumentator import Instrumentator
 from prometheus_client import generate_latest
 
@@ -12,7 +12,9 @@ from src.api.metrics import (
     recomendacao_metric,
 )
 
-from src.core.health_score import calcular_indice_saude_input_simples
+# Importa módulo de cálculo
+import src.core.health_score as health_score
+
 from src.api.schemas import ScoreResponse, ScoreRequest
 from src.core.logging import setup_logging
 from src.observability.metrics import (
@@ -33,21 +35,42 @@ logger.info("Router de API inicializado")
 app = FastAPI(title="Financial AI")
 router = APIRouter(prefix="", tags=["Financial IA"])
 
-# Expor métricas padrão do FastAPI + customizadas
 Instrumentator().instrument(app).expose(app)
+
+# ======================================
+# Expor função para facilitar monkeypatch nos testes
+# ======================================
+calcular_indice_saude_input_simples = health_score.calcular_indice_saude_input_simples
 
 
 # ======================================
 # Endpoints auxiliares
 # ======================================
-@router.get("/health")
+@router.get("/health", summary="Health Check")
 def health_check():
     return {"status": "ok"}
 
 
-@router.get("/metrics")
+@router.get("/metrics", summary="Prometheus Metrics")
 def metrics():
     return Response(generate_latest(), media_type="text/plain")
+
+
+@router.post("/calcular", summary="Cálculo simples de receitas - despesas")
+async def calcular_endpoint(request: Request):
+    try:
+        data = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON")
+
+    if not data or "dados" not in data:
+        raise HTTPException(status_code=400, detail="Invalid request")
+
+    if "receitas" not in data or "despesas" not in data:
+        raise HTTPException(status_code=422, detail="Missing fields")
+
+    resultado = data["receitas"] - data.get("despesas", 0)
+    return {"resultado": resultado}
 
 
 # ======================================
@@ -56,9 +79,9 @@ def metrics():
 def _classificar(score: float) -> str:
     if score >= 80:
         return "Saudável"
-    if score >= 60:
+    elif score >= 60:
         return "Estável"
-    if score >= 40:
+    elif score >= 40:
         return "Risco"
     return "Crítico"
 
@@ -66,9 +89,9 @@ def _classificar(score: float) -> str:
 def _gerar_recomendacao(score: float) -> str:
     if score >= 80:
         return "Mantenha o padrão financeiro atual."
-    if score >= 60:
+    elif score >= 60:
         return "Atenção aos gastos variáveis."
-    if score >= 40:
+    elif score >= 40:
         return "Reduza despesas e priorize quitação de dívidas."
     return "Risco elevado: reestruture sua vida financeira imediatamente."
 
@@ -76,17 +99,17 @@ def _gerar_recomendacao(score: float) -> str:
 # ======================================
 # Endpoint principal
 # ======================================
-@router.post("/score", response_model=ScoreResponse)
+@router.post(
+    "/score", response_model=ScoreResponse, summary="Cálculo de Score Financeiro"
+)
 def calcular_score(payload: ScoreRequest) -> ScoreResponse:
     start_time = time.time()
 
     try:
-        # Atualiza métricas customizadas
         receita_metric.set(payload.receita)
         despesas_metric.set(payload.despesas)
         divida_metric.set(payload.divida)
 
-        # Lógica de cálculo
         score = calcular_indice_saude_input_simples(
             receita=payload.receita,
             despesas=payload.despesas,
@@ -96,13 +119,10 @@ def calcular_score(payload: ScoreRequest) -> ScoreResponse:
         classificacao = _classificar(score)
         recomendacao = _gerar_recomendacao(score)
 
-        # Atualiza métricas de classificação e recomendação
         classificacao_map = {"Saudável": 1, "Estável": 2, "Risco": 3, "Crítico": 4}
         classificacao_metric.set(classificacao_map[classificacao])
-
         recomendacao_metric.set(abs(hash(recomendacao)) % 1000)
 
-        # Métricas de observabilidade
         prediction_count.inc()
         model_state_counter.labels(state="success").inc()
 
