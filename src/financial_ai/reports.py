@@ -1,3 +1,4 @@
+# reports.py
 def generate_fluxo_caixa(data):
     """
     Gera relatório de fluxo de caixa a partir de um DataFrame.
