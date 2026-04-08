@@ -1,4 +1,25 @@
 # reports.py
+from src.financial_ai import reports
+
+
+def gerar_relatorio(dados: dict) -> str:
+    """
+    Gera um relatório simples a partir de um dicionário de dados.
+    Retorna uma string indicando o resultado ou erro.
+    """
+    if not isinstance(dados, dict):
+        raise ValueError("Entrada deve ser um dicionário.")
+
+    if not dados:
+        return "Erro: dados ausentes"
+
+    valores = dados.get("valores")
+    if valores is None:
+        return "Erro: dados inválidos"
+
+    return "Relatório válido"
+
+
 def generate_fluxo_caixa(data):
     """
     Gera relatório de fluxo de caixa a partir de um DataFrame.

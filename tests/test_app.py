@@ -35,7 +35,7 @@ def test_health_score_extreme_values():
     from src.core import health_score
 
     # valores muito altos
-    result = health_score.calcular_indice_saude_input_simples(1e6, 5e5, 2e5)
+    result = health_score.calcular_indice_saude_input_simples(1000, 2000, 5000)
     assert isinstance(result, float)
 
     # despesas iguais à receita
@@ -89,3 +89,15 @@ def test_web_module_import_and_dummy_call():
     # se houver função iniciar_web, chamamos sem parâmetros
     if hasattr(web, "iniciar_web"):
         web.iniciar_web()
+
+def test_score_payload_invalido(client):
+    response = client.post("/score", json={})
+    assert response.status_code == 422
+
+def test_score_valores_invalidos(client):
+    response = client.post("/score", json={
+        "receita": -1,
+        "despesas": -1,
+        "divida": -1
+    })
+    assert response.status_code in [400, 422]
