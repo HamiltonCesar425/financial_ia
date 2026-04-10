@@ -1,4 +1,6 @@
 import pytest
+from fastapi import HTTPException
+
 
 # -------------------------
 # Cobertura extra para app.py
@@ -7,9 +9,9 @@ import pytest
 
 def test_app_score_invalid_payload(client):
     # payload sem campos obrigatórios para acionar ramo 422
-    payload = {"receita": 1000}
+    payload = {"receita": [500 * 12]}
     response = client.post("/score", json=payload)
-    assert response.status_code in (400, 422)
+    assert response.status_code == 422
 
 
 def test_app_score_runtime_error(client, monkeypatch):
@@ -20,10 +22,13 @@ def test_app_score_runtime_error(client, monkeypatch):
 
     monkeypatch.setattr(src.api.app, "calcular_indice_saude_input_simples", fake_calc)
 
-    payload = {"receita": 500, "despesas": 200, "divida": 100}
+    payload = {"receita": [500 * 12]}
     response = client.post("/score", json=payload)
+    data = response.json()
+
     assert response.status_code == 500
-    assert "Erro interno" in response.json()["detail"]
+    assert "detail" in data
+    assert "Erro interno" in data["detail"]
 
 
 # -------------------------
@@ -36,15 +41,20 @@ def test_health_score_extreme_values():
 
     # valores muito altos
     result = health_score.calcular_indice_saude_input_simples(1000, 2000, 5000)
-    assert isinstance(result, float)
+    assert isinstance(result, dict)
+    assert "score" in result
+    assert isinstance(result["score"], float)
 
     # despesas iguais à receita
     result = health_score.calcular_indice_saude_input_simples(1000, 1000, 0)
-    assert isinstance(result, float)
-
+    assert isinstance(result, dict)
+    assert "score" in result
+    assert isinstance(result["score"], float)
     # dívida igual à receita
     result = health_score.calcular_indice_saude_input_simples(1000, 500, 1000)
-    assert isinstance(result, float)
+    assert isinstance(result, dict)
+    assert "score" in result
+    assert isinstance(result["score"], float)
 
 
 def test_health_score_invalid_inputs():
@@ -90,14 +100,12 @@ def test_web_module_import_and_dummy_call():
     if hasattr(web, "iniciar_web"):
         web.iniciar_web()
 
+
 def test_score_payload_invalido(client):
     response = client.post("/score", json={})
     assert response.status_code == 422
 
+
 def test_score_valores_invalidos(client):
-    response = client.post("/score", json={
-        "receita": -1,
-        "despesas": -1,
-        "divida": -1
-    })
+    response = client.post("/score", json={"receita": -1, "despesas": -1, "divida": -1})
     assert response.status_code in [400, 422]

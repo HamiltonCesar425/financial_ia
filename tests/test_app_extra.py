@@ -25,7 +25,6 @@ def test_metrics_endpoint():
 # ==============================
 # Testes de classificação
 # ==============================
-
 def test_classificar_faixas_direto():
     assert _classificar(85) == "Saudável"
     assert _classificar(65) == "Estável"
@@ -33,11 +32,10 @@ def test_classificar_faixas_direto():
     assert _classificar(20) == "Crítico"
 
 
-
 # ==============================
 # Testes de erros internos
 # ==============================
-def test_score_internal_error(monkeypatch, client):
+def test_score_internal_error(monkeypatch):
 
     def fake_calculo(*args, **kwargs):
         raise RuntimeError("Erro simulado")
@@ -64,15 +62,19 @@ def test_receita_negativa_gera_erro():
 
 
 def test_calculo_valido():
-    resultado = health_score.calcular_indice_saude_input_simples(
+    result = health_score.calcular_indice_saude_input_simples(
         receita=10000, despesas=5000, divida=2000
     )
-    assert isinstance(resultado, float)
-    assert 0 <= resultado <= 100
+
+    assert isinstance(result, dict)
+    assert "score" in result
+    assert isinstance(result["score"], float)
+    assert 0 <= result["score"] <= 100
 
 
 def test_calculo_com_valores_limite():
-    resultado = health_score.calcular_indice_saude_input_simples(
+    result = health_score.calcular_indice_saude_input_simples(
         receita=1, despesas=0, divida=0
     )
-    assert resultado >= 0
+
+    assert result["score"] >= 0

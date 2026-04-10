@@ -44,8 +44,11 @@ def test_fetch_data_timeout(monkeypatch):
 
 
 def test_home_endpoint():
-    response = client.get("/")
+    response = client.get("/health")
     assert response.status_code == 200
+    assert response.json() == {"status": "ok"}
+
+
 
 
 def test_endpoint_invalido():
@@ -54,5 +57,5 @@ def test_endpoint_invalido():
 
 
 def test_metodo_invalido():
-    response = client.post("/")
+    response = client.post("/health")
     assert response.status_code in [405, 422]
