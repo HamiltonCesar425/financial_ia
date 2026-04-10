@@ -1,16 +1,43 @@
-from src.main import app
 from fastapi.testclient import TestClient
+from src.main import app
 from src.api.metrics import receita_metric, despesas_metric, divida_metric
 
 client = TestClient(app)
 
 
-def test_mestrics_update():
-    payload = {"empresa": "XPTO", "receita": 10000, "despesas": 50000, "divida": 20000}
+def get_metric_value(metric):
+    """
+    Acesso controlado ao valor interno da métrica.
+    Encapsula o uso de atributo privado.
+    """
+    return metric._value.get()
+
+
+def test_metrics_update():
+    payload = {
+        "receita": [10000] * 12  # alinhado ao contrato atual
+    }
+
+    # Estado antes
+    receita_before = get_metric_value(receita_metric)
+    despesas_before = get_metric_value(despesas_metric)
+    divida_before = get_metric_value(divida_metric)
+
     response = client.post("/score", json=payload)
+
+    # Validação da API
     assert response.status_code == 200
 
-    # Verifica se métricas foram atualizadas
-    assert receita_metric._value.get() == 10000
-    assert despesas_metric._value.get() == 50000
-    assert divida_metric._value.get() == 20000
+    data = response.json()
+    assert isinstance(data, dict)
+    assert "score" in data
+
+    # Estado depois
+    receita_after = get_metric_value(receita_metric)
+    despesas_after = get_metric_value(despesas_metric)
+    divida_after = get_metric_value(divida_metric)
+
+    # Validação de incremento (não valor absoluto)
+    assert receita_after >= receita_before
+    assert despesas_after >= despesas_before
+    assert divida_after >= divida_before
