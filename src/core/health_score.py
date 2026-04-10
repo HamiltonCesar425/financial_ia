@@ -81,9 +81,12 @@ def _validar_rmse(rmse: Optional[float]) -> None:
 def _validar_pesos(pesos: Dict[str, float]) -> None:
     if not isinstance(pesos, dict):
         raise ValueError("Pesos devem ser um dicionário.")
+    
+    valores = list(pesos.values())
 
-    if not np.isclose(sum(pesos.values()), 1.0):
+    if not np.isclose(sum(valores), 1.0):
         raise ValueError("A soma dos pesos deve ser 1.")
+    
 
     for k in ["crescimento", "volatilidade", "momentum", "erro_modelo"]:
         if k not in pesos:
@@ -227,7 +230,7 @@ def calcular_indice_saude(
 
 def calcular_indice_saude_input_simples(
     receita: float, despesas: float, divida: float
-) -> float:
+) -> dict:
 
     if receita <= 0:
         raise ValueError("Renda deve ser maior que zero.")
@@ -238,7 +241,9 @@ def calcular_indice_saude_input_simples(
     comprometimento = (despesas + divida) / receita
     score = 100 * (1 - comprometimento)
 
-    return float(np.clip(score, 0.0, 100.0))
+    return {
+        "score":float(np.clip(score, 0.0, 100.0))
+    }
 
 
 # ==============================================================================
