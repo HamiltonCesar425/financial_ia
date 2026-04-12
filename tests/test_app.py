@@ -22,7 +22,7 @@ def test_app_score_runtime_error(client, monkeypatch):
 
     monkeypatch.setattr(src.api.app, "calcular_indice_saude_input_simples", fake_calc)
 
-    payload = {"receita": [500 * 12]}
+    payload = {"receita": 6000, "despesas": 1000, "divida": 500}
     response = client.post("/score", json=payload)
     data = response.json()
 

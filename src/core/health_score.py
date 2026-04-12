@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from typing import Dict, Optional
+from numbers import Real
 
 
 # ==============================================================================
@@ -81,16 +82,21 @@ def _validar_rmse(rmse: Optional[float]) -> None:
 def _validar_pesos(pesos: Dict[str, float]) -> None:
     if not isinstance(pesos, dict):
         raise ValueError("Pesos devem ser um dicionário.")
-    
-    valores = list(pesos.values())
-
-    if not np.isclose(sum(valores), 1.0):
-        raise ValueError("A soma dos pesos deve ser 1.")
-    
 
     for k in ["crescimento", "volatilidade", "momentum", "erro_modelo"]:
         if k not in pesos:
             raise ValueError(f"Peso ausente: {k}")
+
+    valores = list(pesos.values())
+
+    if not all(isinstance(valor, Real) and not isinstance(valor, bool) for valor in valores):
+        raise ValueError("Todos os pesos devem ser numéricos.")
+
+    if any(valor < 0 for valor in valores):
+        raise ValueError("Os pesos não podem ser negativos.")
+
+    if not np.isclose(sum(valores), 1.0):
+        raise ValueError("A soma dos pesos deve ser 1.")
 
 
 def calcular(dados):
@@ -231,6 +237,16 @@ def calcular_indice_saude(
 def calcular_indice_saude_input_simples(
     receita: float, despesas: float, divida: float
 ) -> dict:
+    for nome, valor in {
+        "receita": receita,
+        "despesas": despesas,
+        "divida": divida,
+    }.items():
+        if not isinstance(valor, Real) or isinstance(valor, bool):
+            raise ValueError(f"{nome.title()} deve ser numérica.")
+
+        if np.isnan(valor) or np.isinf(valor):
+            raise ValueError(f"{nome.title()} inválida.")
 
     if receita <= 0:
         raise ValueError("Renda deve ser maior que zero.")
@@ -241,9 +257,7 @@ def calcular_indice_saude_input_simples(
     comprometimento = (despesas + divida) / receita
     score = 100 * (1 - comprometimento)
 
-    return {
-        "score":float(np.clip(score, 0.0, 100.0))
-    }
+    return {"score": float(np.clip(score, 0.0, 100.0))}
 
 
 # ==============================================================================

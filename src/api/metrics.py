@@ -1,3 +1,5 @@
+import unicodedata
+
 from prometheus_client import Gauge
 
 
@@ -35,16 +37,24 @@ Portanto, usamos encoding numérico controlado.
 """
 
 CLASSIFICACAO_MAP = {
-    "ruim": 0,
+    "critico": 0,
+    "risco": 1,
+    "instavel": 1,
     "regular": 1,
-    "boa": 2,
-    "excelente": 3,
+    "estavel": 2,
+    "saudavel": 3,
+    "boa": 3,
+    "excelente": 4,
 }
 
 RECOMENDACAO_MAP = {
     "reduzir_custos": 0,
+    "reduza despesas e priorize quitacao de dividas.": 0,
     "manter": 1,
-    "expandir": 2,
+    "mantenha o padrao financeiro atual.": 1,
+    "atencao aos gastos variaveis.": 2,
+    "expandir": 3,
+    "risco elevado: reestruture sua vida financeira imediatamente.": 3,
 }
 
 
@@ -98,13 +108,23 @@ def update_metrics(
     # Atualização categórica
     # --------------------------
     if classificacao is not None:
-        if classificacao not in CLASSIFICACAO_MAP:
+        classificacao_key = _normalize_category(classificacao)
+
+        if classificacao_key not in CLASSIFICACAO_MAP:
             raise ValueError(f"Classificação inválida: {classificacao}")
 
-        classificacao_metric.set(CLASSIFICACAO_MAP[classificacao])
+        classificacao_metric.set(CLASSIFICACAO_MAP[classificacao_key])
 
     if recomendacao is not None:
-        if recomendacao not in RECOMENDACAO_MAP:
+        recomendacao_key = _normalize_category(recomendacao)
+
+        if recomendacao_key not in RECOMENDACAO_MAP:
             raise ValueError(f"Recomendação inválida: {recomendacao}")
 
-        recomendacao_metric.set(RECOMENDACAO_MAP[recomendacao])
+        recomendacao_metric.set(RECOMENDACAO_MAP[recomendacao_key])
+
+
+def _normalize_category(value: str) -> str:
+    normalized = unicodedata.normalize("NFKD", value)
+    normalized = normalized.encode("ascii", "ignore").decode("ascii")
+    return normalized.strip().lower()

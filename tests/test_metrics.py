@@ -15,7 +15,9 @@ def get_metric_value(metric):
 
 def test_metrics_update():
     payload = {
-        "receita": [10000] * 12  # alinhado ao contrato atual
+        "receita": 10000,
+        "despesas": 2500,
+        "divida": 1000,
     }
 
     # Estado antes
@@ -37,7 +39,7 @@ def test_metrics_update():
     despesas_after = get_metric_value(despesas_metric)
     divida_after = get_metric_value(divida_metric)
 
-    # Validação de incremento (não valor absoluto)
-    assert receita_after >= receita_before
-    assert despesas_after >= despesas_before
-    assert divida_after >= divida_before
+    # Gauge atualiza o valor atual, não faz incremento acumulado.
+    assert receita_after == payload["receita"]
+    assert despesas_after == payload["despesas"]
+    assert divida_after == payload["divida"]
