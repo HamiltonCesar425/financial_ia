@@ -1,12 +1,81 @@
 # Financial IA
 
-API em **FastAPI** para análise financeira, com observabilidade integrada via **Prometheus** e **Grafana**.
+## 📊 Diagnóstico Financeiro Automatizado
+
+***Entenda sua saúde financeira em menos de 1 minuto**
+
+Este projeto evoluiu para um MVP funcional que permite ao usuário:
+
+* Informar receita, despesas e dívida
+* Receber um score financeiro
+* Obter classificação e recomendação prática
+
+---
+
+## 🚀 Como rodar o projeto
+
+### Backend (FastAPI)
+
+```bash
+uvicorn src.api.app:app --reload
+```
+
+Acesse:
+
+``http://localhost:8000/docs``
+
+---
+
+### Frontend (React)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Acesse:
+
+``http://localhost:5173``
+
+---
+
+## 🔗 Integração
+
+Endpoint principal:
+
+```
+POST /score
+```
+
+---
+
+## 📈 Funcionalidades do MVP
+
+* Validação de entrada (frontend + backend)
+* Cálculo de score financeiro
+* Classificação automática
+* Recomendação prática
+* Interface web responsiva
+
+---
+
+## ⚠️ Aviso Legal
+
+Esta análise tem caráter informativo e não substitui orientação financeira profissional.
+
+---
+
+## 🔍 Observabilidade (nível avançado)
+
+Este projeto também possui infraestrutura para monitoramento com:
+
+* Prometheus
+* Grafana
 
 ---
 
 ## 🚀 Como subir os containers
-
-Para iniciar todos os serviços (API, Prometheus e Grafana), execute:
 
 ```bash
 docker-compose up --build
@@ -14,54 +83,41 @@ docker-compose up --build
 
 ---
 
-Isso vai construir as imagens e subir os containers definidos no docker-compose.yml.
-
----
----
-
 ## 📊 Acessando os serviços
 
-. API FastAPI
+### API FastAPI
 
-  . Documentação: ```http://localhost:8000/docs```
+```
+* http://localhost:8000/docs
 
-  . Health check: ``http://localhost:8000/health``
+* http://localhost:8000/health
 
-  . Métricas Prometheus: ``http://localhost:8000/metrics``
+* http://localhost:8000/metrics
 
----
-. Prometheus
+```
 
-  . Interface: ``http://localhost:9090``
+### Prometheus
 
-  . Targets: ``http://localhost:9090/targets``
+```
+* http://localhost:9090 
 
----
-. Grafana
-
-  . Interface: ``http://localhost:3000``
-
-  . Usuário padrão: admin
-
-  . Senha padrão: admin (solicita alteração no primeiro login)
+```
 
 ---
 
-## 📈 Importando dashboards no Grafana
+### Grafana
 
-1. Acesse o Grafana em ``http://localhost:3000.``
+```
+* http://localhost:3000
 
-2. Vá em Dashboards → Import.
+Usuário: admin
+Senha: admin
 
-3. Cole o JSON do dashboard customizado (exemplo abaixo) ou faça      upload do arquivo .json.
-
-4. Selecione o data source Prometheus.
-
-5. Clique em Import.
+```
 
 ---
 
-## 🖼️ Exemplo de JSON de dashboard
+## 📈 Dashboards
 
 ```json
 {
@@ -90,18 +146,18 @@ Isso vai construir as imagens e subir os containers definidos no docker-compose.
 ```
 
 ---
----
 
-## ✅ Resultado esperado
+## 📌 Status do Projeto
 
-. Após importar o dashboard, você terá:
-
-. Total de predições realizadas
-
-. Número de erros de predição
-
-. Estado do modelo (sucesso vs erro)
-
-. Latência e métricas de requisições (se adicionar painéis extras)
+✔ MVP funcional (frontend + backend)
+✔ Integração completa
+✔ Observabilidade com Prometheus/Grafana
+⬜ Persistência de dados
 
 ---
+
+## 🎯 Próximos passos
+
+* Persistência de diagnósticos
+* Dashboard analítico
+* Deploy em nuvem
