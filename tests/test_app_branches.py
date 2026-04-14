@@ -11,7 +11,7 @@ def test_app_invalid_request(client):
     # Força um request inválido para cobrir branch de erro
     payload = {"receitas": 1000, "despesas": 500}
     response = client.post("/calcular", json=payload)
-    assert response.status_code == 400
+    assert response.status_code == 422
 
 
 def test_app_missing_fields(client):

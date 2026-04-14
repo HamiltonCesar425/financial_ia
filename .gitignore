@@ -10,7 +10,13 @@ __pycache__/
 
 # Virtual env
 .venv/
+.env
 
 # OS
 .DS_Store
 *.coverage
+thumbs.db
+
+# Node
+node_modules/
+dist/

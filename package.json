@@ -1,0 +1,28 @@
+{
+  "name": "financial_ia",
+  "version": "1.0.0",
+  "description": "API em **FastAPI** para análise financeira, com observabilidade integrada via **Prometheus** e **Grafana**.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HamiltonCesar425/financial_ia.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/HamiltonCesar425/financial_ia/issues"
+  },
+  "homepage": "https://github.com/HamiltonCesar425/financial_ia#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

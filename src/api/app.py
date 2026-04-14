@@ -1,6 +1,7 @@
 import time
 from fastapi import FastAPI, APIRouter, HTTPException
 from prometheus_fastapi_instrumentator import Instrumentator
+from starlette.middleware.cors import CORSMiddleware
 
 import src.core.health_score as health_score
 
@@ -24,6 +25,17 @@ logger.info("Router de API inicializado")
 # ======================================
 app = FastAPI(title="Financial AI")
 router = APIRouter(prefix="", tags=["Financial AI"])
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 Instrumentator().instrument(app).expose(app)
 
