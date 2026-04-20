@@ -48,6 +48,33 @@ Endpoint principal:
 POST /score
 ```
 
+Frontend publicado:
+
+```text
+https://financial-ia-sandy.vercel.app
+```
+
+Backend publicado:
+
+```text
+https://financial-ia.onrender.com
+```
+
+---
+
+## 🌐 Variável de ambiente do frontend
+
+Para o frontend publicado e para testes locais com a API em nuvem, a variável `VITE_API_URL` deve apontar para o backend correto:
+
+```env
+VITE_API_URL=https://financial-ia.onrender.com
+```
+
+Observação:
+
+* Se `VITE_API_URL` não estiver definida, o frontend usa `http://localhost:8000`
+* Em produção na Vercel, a variável precisa estar configurada com a URL pública do backend
+
 ---
 
 ## 📈 Funcionalidades do MVP
