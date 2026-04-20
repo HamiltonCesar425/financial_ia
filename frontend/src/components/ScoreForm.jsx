@@ -24,7 +24,7 @@ export default function ScoreForm({ onSubmit, loading }) {
     {
       id: "divida",
       label: "Divida atual",
-      placeholder: "10000",
+      placeholder: "1000",
       helper: "Informe o total atual da sua divida.",
     },
   ];
