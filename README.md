@@ -77,6 +77,140 @@ Observação:
 
 ---
 
+## 🚢 Fluxo oficial de deploy
+
+### Backend no Render
+
+Objetivo: publicar a API FastAPI em produção.
+
+Passos:
+
+1. Fazer commit das mudanças do backend
+2. Dar `push` para a branch conectada ao Render, atualmente `main`
+3. Verificar no Render se o deploy automático iniciou
+4. Se necessário, usar:
+   * `Manual Deploy`
+   * `Clear build cache & deploy`
+5. Validar as rotas públicas:
+
+```text
+https://financial-ia.onrender.com/
+https://financial-ia.onrender.com/health
+https://financial-ia.onrender.com/docs
+```
+
+Fluxo local típico:
+
+```bash
+git add .
+git commit -m "Sua mensagem"
+git push origin main
+```
+
+### Frontend na Vercel
+
+Objetivo: publicar a interface React conectada ao backend correto.
+
+Passos:
+
+1. Fazer commit das mudanças do frontend
+2. Dar `push` para `main`
+3. Se necessário, publicar manualmente:
+
+```bash
+vercel --prod
+```
+
+4. Validar a aplicação publicada:
+
+```text
+https://financial-ia-sandy.vercel.app
+```
+
+Observação:
+
+* O deploy deve ser feito a partir da raiz do projeto
+* Não executar `vercel --prod` dentro de `frontend` se o projeto Vercel estiver configurado com root directory `frontend`
+
+### Atualização de variáveis de ambiente
+
+Objetivo: garantir que o frontend use a URL correta do backend.
+
+Variável principal:
+
+```env
+VITE_API_URL=https://financial-ia.onrender.com
+```
+
+Quando atualizar:
+
+* mudança de domínio do backend
+* troca de ambiente
+* migração de serviço no Render
+
+Fluxo na Vercel:
+
+1. Remover variável antiga, se necessário:
+
+```bash
+vercel env rm VITE_API_URL production
+vercel env rm VITE_API_URL preview
+vercel env rm VITE_API_URL development
+```
+
+2. Recriar a variável:
+
+```bash
+vercel env add VITE_API_URL production
+vercel env add VITE_API_URL preview
+vercel env add VITE_API_URL development
+```
+
+3. Puxar localmente para conferência:
+
+```bash
+vercel env pull .env.local
+Get-Content .\.env.local
+```
+
+4. Fazer novo deploy:
+
+```bash
+vercel --prod
+```
+
+### Ordem recomendada quando backend e frontend mudam
+
+1. Publicar o backend no Render
+2. Validar o backend público
+3. Atualizar `VITE_API_URL` se necessário
+4. Publicar o frontend na Vercel
+5. Validar o fluxo completo no navegador
+
+### Checklist rápido de validação
+
+Backend:
+
+* `/` responde
+* `/health` responde
+* `/docs` abre
+
+Frontend:
+
+* landing page carrega
+* formulário envia
+* score aparece
+* classificação aparece
+* recomendação aparece
+
+Integração:
+
+* sem erro de CORS
+* sem erro de URL inválida
+* sem falha de conexão com o servidor
+
+---
+
 ## 📈 Funcionalidades do MVP
 
 * Validação de entrada (frontend + backend)
