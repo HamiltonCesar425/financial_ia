@@ -6,7 +6,7 @@ from starlette.middleware.cors import CORSMiddleware
 import src.core.health_score as health_score
 
 from src.api.schemas import ScoreResponse, ScoreRequest
-from src.api.metrics import update_metrics, PREDICTION_REQUESTS, PREDICTION_LATENCY
+from src.api.metrics import update_metrics, PREDICTION_REQUESTS, PREDICTION_LATENCY, REQUEST_COUNT
 from src.core.logging import setup_logging
 from src.observability.metrics import (
     prediction_count,
@@ -107,47 +107,53 @@ def _gerar_recomendacao(score: float) -> str:
 @router.post("/score", response_model=ScoreResponse)
 def calcular_score(payload: ScoreRequest) -> ScoreResponse:
 
-    with PREDICTION_LATENCY.time():
+    # Contador de requisição (primeira coisa)
+    REQUEST_COUNT.labels(endpoint="/score").inc()
 
-        try:
-            result = calcular_indice_saude_input_simples(
-                receita=payload.receita,
-                despesas=payload.despesas,
-                divida=payload.divida,
-            )
+    start = time.time()
 
-            score = result["score"]
-            classificacao = _classificar(score)
-            recomendacao = _gerar_recomendacao(score)
+    try:
+        result = calcular_indice_saude_input_simples(
+            receita=payload.receita,
+            despesas=payload.despesas,
+            divida=payload.divida,
+        )
 
-            update_metrics(
-                receita=payload.receita,
-                despesas=payload.despesas,
-                divida=payload.divida,
-                classificacao=classificacao.lower(),
-                recomendacao=recomendacao.lower(),
-            )
+        score = result["score"]
+        classificacao = _classificar(score)
+        recomendacao = _gerar_recomendacao(score)
 
-            PREDICTION_REQUESTS.labels(status="success").inc()
-            prediction_count.inc()
-            prediction_errors
-            model_state_counter.labels(state="success").inc()
+        update_metrics(
+            receita=payload.receita,
+            despesas=payload.despesas,
+            divida=payload.divida,
+            classificacao=classificacao.lower(),
+            recomendacao=recomendacao.lower(),
+        )
 
-            return ScoreResponse(
-                score=score,
-                classificacao=classificacao,
-                recomendacao=recomendacao,
-            )
+        PREDICTION_REQUESTS.labels(status="success").inc()
 
-        except Exception as exc:
-            logger.exception("Erro interno na predição")
-            PREDICTION_REQUESTS.labels(status="error").inc()
-            model_state_counter.labels(state="error").inc()
+        return ScoreResponse(
+            score=score,
+            classificacao=classificacao,
+            recomendacao=recomendacao,
+        )
 
-            raise HTTPException(
-                status_code=500,
-                detail="Erro interno na predição",
-            ) from exc
+    except Exception as exc:
+        logger.exception("Erro interno na predição")
+
+        PREDICTION_REQUESTS.labels(status="error").inc()
+
+        raise HTTPException(
+            status_code=500,
+            detail="Erro interno na predição",
+        ) from exc
+
+    finally:
+        # Latência SEMPRE registrada (sucesso ou erro)
+        PREDICTION_LATENCY.labels(endpoint="/score").observe(
+            time.time() - start
+        )
 # ======================================
 # Router
 # ======================================

@@ -1,4 +1,5 @@
 import unicodedata
+from typing import Optional
 
 from prometheus_client import Counter, Histogram, Gauge
 
@@ -13,8 +14,14 @@ NAMESPACE = "financial_ai"
 # COUNTERS (PADRÃO RED)
 # ==========================================
 
+REQUEST_COUNT = Counter(
+    f"{NAMESPACE}_request_count_total",
+    "Total de requisições recebidas",
+    ["endpoint"],
+)
+
 PREDICTION_REQUESTS = Counter(
-    "financial_ai_prediction_requests_total",
+    f"{NAMESPACE}_prediction_requests_total",
     "Total de requisições de predição",
     ["status"],  # success | error
 )
@@ -38,28 +45,31 @@ RECOMMENDATION_COUNTER = Counter(
 
 PREDICTION_LATENCY = Histogram(
     f"{NAMESPACE}_prediction_latency_seconds",
-    "Tempo de execução do endpoint /score",
+    "Tempo de execução do endpoint",
+    ["endpoint"],
 )
 
 RECEITA_HIST = Histogram(
     f"{NAMESPACE}_receita_distribution",
     "Distribuição de receita",
+    buckets=(0, 1000, 5000, 10000, 50000, 100000, float("inf")),
 )
 
 DESPESAS_HIST = Histogram(
     f"{NAMESPACE}_despesas_distribution",
     "Distribuição de despesas",
+    buckets=(0, 1000, 5000, 10000, 50000, 100000, float("inf")),
 )
 
 DIVIDA_HIST = Histogram(
     f"{NAMESPACE}_divida_distribution",
     "Distribuição de dívida",
+    buckets=(0, 1000, 5000, 10000, 50000, 100000, float("inf")),
 )
 
 
 # ==========================================
 # LEGACY METRICS (COMPATIBILIDADE COM TESTES)
-# NÃO REMOVER (mantém pytest --cov estável)
 # ==========================================
 
 receita_metric = Gauge(
@@ -89,7 +99,7 @@ recomendacao_metric = Gauge(
 
 
 # ==========================================
-# MAPS (MANTIDOS PARA VALIDAÇÃO E TESTES)
+# MAPS (VALIDAÇÃO E TESTES)
 # ==========================================
 
 CLASSIFICACAO_MAP = {
@@ -123,20 +133,20 @@ def update_metrics(
     receita: float,
     despesas: float,
     divida: float,
-    classificacao: str | None = None,
-    recomendacao: str | None = None,
+    classificacao: Optional[str] = None,
+    recomendacao: Optional[str] = None,
 ) -> None:
     """
     Atualiza métricas de forma compatível com Prometheus e testes existentes.
 
     Estratégia:
-    - Histogram: distribuição (correto para observabilidade)
+    - Histogram: distribuição (produção)
     - Counter + labels: categórico (padrão Prometheus)
     - Gauge: compatibilidade com testes legacy
     """
 
     # --------------------------
-    # Validação (mantida p/ coverage)
+    # Validação
     # --------------------------
     if receita < 0 or despesas < 0 or divida < 0:
         raise ValueError("Valores financeiros não podem ser negativos")
@@ -164,12 +174,10 @@ def update_metrics(
         if classificacao_key not in CLASSIFICACAO_MAP:
             raise ValueError(f"Classificação inválida: {classificacao}")
 
-        # Prometheus correto
         CLASSIFICATION_COUNTER.labels(
             classificacao=classificacao_key
         ).inc()
 
-        # Legacy (testes)
         classificacao_metric.set(CLASSIFICACAO_MAP[classificacao_key])
 
     # --------------------------
@@ -181,12 +189,10 @@ def update_metrics(
         if recomendacao_key not in RECOMENDACAO_MAP:
             raise ValueError(f"Recomendação inválida: {recomendacao}")
 
-        # Prometheus correto
         RECOMMENDATION_COUNTER.labels(
             recomendacao=recomendacao_key
         ).inc()
 
-        # Legacy (testes)
         recomendacao_metric.set(RECOMENDACAO_MAP[recomendacao_key])
 
 
