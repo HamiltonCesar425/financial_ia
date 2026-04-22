@@ -14,7 +14,7 @@ NAMESPACE = "financial_ai"
 # ==========================================
 
 PREDICTION_REQUESTS = Counter(
-    f"{NAMESPACE}_prediction_requests_total",
+    "financial_ai_prediction_requests_total",
     "Total de requisições de predição",
     ["status"],  # success | error
 )
