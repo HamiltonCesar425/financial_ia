@@ -3,7 +3,7 @@ import requests
 from src.financial_ai import web
 from fastapi.testclient import TestClient
 from src.financial_ai.web import app
-from src.main import app
+
 
 client = TestClient(app)
 

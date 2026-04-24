@@ -19,11 +19,7 @@ def test_metrics_update():
         "despesas": 2500,
         "divida": 1000,
     }
-
-    # Estado antes
-    receita_before = get_metric_value(receita_metric)
-    despesas_before = get_metric_value(despesas_metric)
-    divida_before = get_metric_value(divida_metric)
+   
 
     response = client.post("/score", json=payload)
 

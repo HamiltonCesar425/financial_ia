@@ -1,5 +1,4 @@
 # reports.py
-from src.financial_ai import reports
 
 
 def gerar_relatorio(dados: dict) -> str:

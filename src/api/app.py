@@ -8,11 +8,6 @@ import src.core.health_score as health_score
 from src.api.schemas import ScoreResponse, ScoreRequest
 from src.api.metrics import update_metrics, PREDICTION_REQUESTS, PREDICTION_LATENCY, REQUEST_COUNT
 from src.core.logging import setup_logging
-from src.observability.metrics import (
-    prediction_count,
-    prediction_errors,
-    model_state_counter,
-)
 
 # ======================================
 # Logging

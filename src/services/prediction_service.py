@@ -1,6 +1,4 @@
-import pandas as pd
 from typing import List, Dict, Any
-from src.core.health_score import calcular_indice_saude
 from src.engine.calculation_engine import FinancialHealthEngine
 from src.observability.metrics import model_state_counter
 

@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 
 from run_backtest import select_optimal_k, run_out_of_sample_backtest

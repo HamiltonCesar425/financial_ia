@@ -1,5 +1,4 @@
 import pytest
-from src.api import app
 from src.core import health_score
 
 # -------------------------------
