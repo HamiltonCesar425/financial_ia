@@ -47,9 +47,21 @@ calcular_indice_saude_input_simples = health_score.calcular_indice_saude_input_s
 # ======================================
 # Endpoints auxiliares
 # ======================================
+@app.get("/", summary="Root")
+def root():
+    return {
+        "message": "Diagnóstico Financeiro Automatizado API online",
+        "status":"running"
+    }
+
+@app.get("/health", summary="Health check")
+def health():
+    return {"status": "ok"}
+
+
 @router.get("/", summary="Root")
 def root():
-    return {"message": "Diagnostico Financeiro Automatizado API online"}
+    return {"message": "Diagnóstico Financeiro Automatizado API online"}
 
 
 @router.get("/health", summary="Health Check")
