@@ -1,4 +1,9 @@
-# Testes
-pytest
-pytest-cov
-coverage
+# requirements-dev.txt ->desenvolvimento
+-r requirements.txt
+
+pytest>=9.0.3
+pytest-cov>=7.0
+bandit>=1.9
+pip-audit>=2.10
+coverage>=7.13
+ruff>=0.4
