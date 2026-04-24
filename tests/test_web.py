@@ -1,9 +1,7 @@
 import pytest
 import requests
-from src.financial_ai import web
+from src.financial_ai import web, app
 from fastapi.testclient import TestClient
-from src.financial_ai.web import app
-
 
 client = TestClient(app)
 
