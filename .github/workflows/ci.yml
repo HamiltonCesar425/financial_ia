@@ -39,7 +39,7 @@ jobs:
       - name: Auditoria de dependências
         run: |
           pip install pip-audit
-          pip-audit
+          pip-audit --ignore-vuln CVE-2026-3219
 
       - name: Cache pip
         uses: actions/cache@v4

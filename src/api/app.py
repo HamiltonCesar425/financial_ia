@@ -59,14 +59,7 @@ def health():
     return {"status": "ok"}
 
 
-@router.get("/", summary="Root")
-def root():
-    return {"message": "Diagnóstico Financeiro Automatizado API online"}
 
-
-@router.get("/health", summary="Health Check")
-def health_check():
-    return {"status": "ok"}
 
 
 # ======================================
