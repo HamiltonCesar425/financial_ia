@@ -1,6 +1,5 @@
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
-from typing import Literal
+from pydantic import BaseModel, Field, ConfigDict, field_validator
+from typing import List, Literal
 
 
 # ==============================
@@ -19,9 +18,18 @@ class ReceitaInput(BaseModel):
         json_schema_extra={
             "example": {
                 "receita": [
-                    10000, 12000, 11000, 13000,
-                    12500, 14000, 15000, 14500,
-                    16000, 17000, 16500, 18000,
+                    10000,
+                    12000,
+                    11000,
+                    13000,
+                    12500,
+                    14000,
+                    15000,
+                    14500,
+                    16000,
+                    17000,
+                    16500,
+                    18000,
                 ]
             }
         },
@@ -35,6 +43,32 @@ class ScoreRequest(BaseModel):
     receita: float = Field(..., gt=0, description="Receita deve ser maior que zero")
     despesas: float = Field(..., ge=0, description="Despesas não podem ser negativas")
     divida: float = Field(..., ge=0, description="Dívida não pode ser negativa")
+
+    model_config = ConfigDict(extra="forbid")
+
+
+# ==============================
+# INPUT - Diagnóstico
+# ==============================
+class DiagnosisRequest(BaseModel):
+    receita: float = Field(..., gt=0, description="Receita deve ser maior que zero")
+    despesas: float = Field(..., ge=0, description="Despesas não podem ser negativas")
+
+    model_config = ConfigDict(extra="forbid")
+
+    @field_validator("despesas")
+    @classmethod
+    def expenses_not_greater_than_income(cls, v, values):
+        receita = values.data.get("receita")
+        if receita is not None and v > receita:
+            raise ValueError("Despesas não podem ser maiores que a receita")
+        return v
+
+
+class DiagnosisResponse(BaseModel):
+    score: int = Field(..., ge=0, le=100, description="Score do diagnóstico")
+    message: str = Field(..., min_length=3, description="Mensagem principal do diagnóstico")
+    recommendation: str = Field(..., min_length=3, description="Recomendação principal")
 
     model_config = ConfigDict(extra="forbid")
 
