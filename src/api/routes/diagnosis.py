@@ -18,6 +18,7 @@ def _normalize_csv_columns(df: pd.DataFrame) -> pd.DataFrame:
         "income": "receita",
         "expenses": "despesas",
         "receita": "receita",
+        "receitas": "receita",
         "despesas": "despesas",
     }
     normalized_columns = {
