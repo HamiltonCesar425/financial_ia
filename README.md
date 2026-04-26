@@ -1,324 +1,287 @@
 # Financial IA
 
-## 📊 Diagnóstico Financeiro Automatizado
+## Plataforma de diagnóstico financeiro com backend observável, frontend web e pipeline seguro
 
-***Entenda sua saúde financeira em menos de 1 minuto**
+Financial IA é uma aplicação full stack criada para transformar dados financeiros simples em um diagnóstico rápido, legível e acionável. A proposta do projeto é unir experiência de produto, engenharia de software e práticas modernas de confiabilidade em uma solução que recebe receita, despesas e dívida, calcula um score financeiro e devolve classificação e recomendação prática.
 
-Este projeto evoluiu para um MVP funcional que permite ao usuário:
+Além da experiência do usuário, o projeto foi estruturado com foco em qualidade operacional: cobertura de testes elevada, análise estática, auditoria de dependências com lockfiles reproduzíveis e pipeline de CI preparado para evitar regressões futuras.
 
-* Informar receita, despesas e dívida
-* Receber um score financeiro
-* Obter classificação e recomendação prática
+## Destaques do projeto
 
----
+- backend em FastAPI com rotas de aplicação, saúde e métricas
+- frontend em React/Vite para interação rápida e objetiva
+- motor de cálculo com classificação e recomendação financeira
+- observabilidade com Prometheus e Grafana
+- suíte de testes automatizados com cobertura acima do mínimo exigido
+- auditoria de dependências com `pip-audit` baseada em lockfiles
+- workflow de CI consolidado com controle de concorrência para evitar filas desnecessárias
 
-## 🚀 Como rodar o projeto
+## O que a aplicação entrega
 
-### Backend (FastAPI)
+O usuário informa dados financeiros essenciais e recebe:
 
-```bash
+- score financeiro
+- classificação do cenário
+- recomendação prática
+
+Isso torna o projeto útil tanto como MVP de produto quanto como demonstração técnica de uma aplicação Python moderna com frontend integrado.
+
+## Arquitetura resumida
+
+```text
+.
+├── .github/workflows/ci.yml
+├── frontend/
+├── src/
+├── tests/
+├── requirements.txt
+├── requirements-dev.txt
+├── requirements.lock
+├── requirements-dev.lock
+└── README.md
+```
+
+## Stack técnica
+
+### Backend
+
+- Python 3.10
+- FastAPI
+- Pydantic
+- scikit-learn
+- hmmlearn
+- Prometheus instrumentation
+
+### Frontend
+
+- React
+- Vite
+
+### Qualidade e segurança
+
+- pytest
+- pytest-cov
+- Ruff
+- Bandit
+- pip-audit
+- pip-tools
+- GitHub Actions
+
+## Execução local
+
+### 1. Criar ambiente virtual
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
+
+### 2. Instalar dependências reproduzíveis
+
+Ambiente completo de desenvolvimento:
+
+```powershell
+python -m pip install --upgrade pip setuptools wheel
+python -m pip install -r requirements-dev.lock
+```
+
+Apenas dependências principais:
+
+```powershell
+python -m pip install -r requirements.lock
+```
+
+### 3. Subir o backend
+
+```powershell
 uvicorn src.api.app:app --reload
 ```
 
-Acesse:
+Rotas locais:
 
-``http://localhost:8000/docs``
+- `http://localhost:8000/`
+- `http://localhost:8000/health`
+- `http://localhost:8000/docs`
+- `http://localhost:8000/metrics`
 
----
+### 4. Subir o frontend
 
-### Frontend (React)
-
-```bash
+```powershell
 cd frontend
 npm install
 npm run dev
 ```
 
-Acesse:
+Frontend local:
 
-``http://localhost:5173``
+- `http://localhost:5173`
 
----
+## Configuração de ambiente
 
-## 🔗 Integração
-
-Endpoint principal:
-
-```
-POST /score
-```
-
-Frontend publicado:
-
-```text
-https://financial-ia-sandy.vercel.app
-```
-
-Backend publicado:
-
-```text
-https://financial-ia.onrender.com
-```
-
----
-
-## 🌐 Variável de ambiente do frontend
-
-Para o frontend publicado e para testes locais com a API em nuvem, a variável `VITE_API_URL` deve apontar para o backend correto:
+Para conectar o frontend ao backend publicado:
 
 ```env
 VITE_API_URL=https://financial-ia.onrender.com
 ```
 
-Observação:
+Se `VITE_API_URL` não estiver definida, o frontend usa `http://localhost:8000`.
 
-* Se `VITE_API_URL` não estiver definida, o frontend usa `http://localhost:8000`
-* Em produção na Vercel, a variável precisa estar configurada com a URL pública do backend
+## Qualidade, testes e segurança
 
----
+### Lint
 
-## 🚢 Fluxo oficial de deploy
-
-### Backend no Render
-
-Objetivo: publicar a API FastAPI em produção.
-
-Passos:
-
-1. Fazer commit das mudanças do backend
-2. Dar `push` para a branch conectada ao Render, atualmente `main`
-3. Verificar no Render se o deploy automático iniciou
-4. Se necessário, usar:
-   * `Manual Deploy`
-   * `Clear build cache & deploy`
-5. Validar as rotas públicas:
-
-```text
-https://financial-ia.onrender.com/
-https://financial-ia.onrender.com/health
-https://financial-ia.onrender.com/docs
+```powershell
+python -m ruff check .
 ```
 
-Fluxo local típico:
+### Testes com cobertura
 
-```bash
-git add .
-git commit -m "Sua mensagem"
-git push origin main
+```powershell
+python -m pytest --cov=src --cov-report=term-missing
 ```
 
-### Frontend na Vercel
+### Segurança estática
 
-Objetivo: publicar a interface React conectada ao backend correto.
+```powershell
+python -m bandit -r src -ll
+```
 
-Passos:
+### Auditoria de dependências
 
-1. Fazer commit das mudanças do frontend
-2. Dar `push` para `main`
-3. Se necessário, publicar manualmente:
+Produção:
 
-```bash
+```powershell
+python -m pip_audit -r requirements.lock
+```
+
+Desenvolvimento:
+
+```powershell
+python -m pip_audit -r requirements-dev.lock
+```
+
+## Estratégia de dependências
+
+O projeto usa dois níveis de gerenciamento:
+
+- `requirements.txt` e `requirements-dev.txt` para dependências diretas
+- `requirements.lock` e `requirements-dev.lock` para árvore completa congelada
+
+Essa abordagem foi adotada para melhorar:
+
+- reprodutibilidade local e no CI
+- previsibilidade de instalações
+- rastreabilidade de mudanças
+- auditoria de segurança com menos ruído
+
+Para regenerar os lockfiles:
+
+```powershell
+.venv\Scripts\pip-compile requirements.txt --cache-dir .pip-tools-cache --output-file requirements.lock
+.venv\Scripts\pip-compile requirements-dev.txt --cache-dir .pip-tools-cache --output-file requirements-dev.lock
+```
+
+Fluxo recomendado ao atualizar dependências:
+
+1. atualizar os arquivos base
+2. regenerar os lockfiles
+3. rodar lint, testes, Bandit e `pip-audit`
+4. validar o CI antes de promover novas alterações
+
+## CI/CD
+
+O pipeline em `.github/workflows/ci.yml` foi consolidado para refletir uma rotina de engenharia mais robusta. Ele executa:
+
+1. checkout do código
+2. setup do Python com cache de `pip`
+3. instalação por `requirements-dev.lock`
+4. lint com Ruff
+5. testes com cobertura
+6. análise estática com Bandit
+7. auditoria de dependências principais via `requirements.lock`
+8. auditoria de dependências de desenvolvimento via `requirements-dev.lock`
+
+O workflow também usa `concurrency` para cancelar execuções antigas da mesma branch, reduzindo filas e ruído operacional no GitHub Actions.
+
+## Deploy
+
+> Backend
+
+Publicado em:
+
+- `https://financial-ia.onrender.com`
+
+Rotas públicas para validação:
+
+- `https://financial-ia.onrender.com/`
+- `https://financial-ia.onrender.com/health`
+- `https://financial-ia.onrender.com/docs`
+
+> Frontend
+
+Publicado em:
+
+- `https://financial-ia-sandy.vercel.app`
+
+Deploy manual, se necessário:
+
+```powershell
 vercel --prod
 ```
 
-4. Validar a aplicação publicada:
+## Observabilidade
 
-```text
-https://financial-ia-sandy.vercel.app
-```
+O projeto inclui instrumentação para monitoramento local com:
 
-Observação:
+- Prometheus
+- Grafana
 
-* O deploy deve ser feito a partir da raiz do projeto
-* Não executar `vercel --prod` dentro de `frontend` se o projeto Vercel estiver configurado com root directory `frontend`
+Subida com containers:
 
-### Atualização de variáveis de ambiente
-
-Objetivo: garantir que o frontend use a URL correta do backend.
-
-Variável principal:
-
-```env
-VITE_API_URL=https://financial-ia.onrender.com
-```
-
-Quando atualizar:
-
-* mudança de domínio do backend
-* troca de ambiente
-* migração de serviço no Render
-
-Fluxo na Vercel:
-
-1. Remover variável antiga, se necessário:
-
-```bash
-vercel env rm VITE_API_URL production
-vercel env rm VITE_API_URL preview
-vercel env rm VITE_API_URL development
-```
-
-2. Recriar a variável:
-
-```bash
-vercel env add VITE_API_URL production
-vercel env add VITE_API_URL preview
-vercel env add VITE_API_URL development
-```
-
-3. Puxar localmente para conferência:
-
-```bash
-vercel env pull .env.local
-Get-Content .\.env.local
-```
-
-4. Fazer novo deploy:
-
-```bash
-vercel --prod
-```
-
-### Ordem recomendada quando backend e frontend mudam
-
-1. Publicar o backend no Render
-2. Validar o backend público
-3. Atualizar `VITE_API_URL` se necessário
-4. Publicar o frontend na Vercel
-5. Validar o fluxo completo no navegador
-
-### Checklist rápido de validação
-
-Backend:
-
-* `/` responde
-* `/health` responde
-* `/docs` abre
-
-Frontend:
-
-* landing page carrega
-* formulário envia
-* score aparece
-* classificação aparece
-* recomendação aparece
-
-Integração:
-
-* sem erro de CORS
-* sem erro de URL inválida
-* sem falha de conexão com o servidor
-
----
-
-## 📈 Funcionalidades do MVP
-
-* Validação de entrada (frontend + backend)
-* Cálculo de score financeiro
-* Classificação automática
-* Recomendação prática
-* Interface web responsiva
-
----
-
-## ⚠️ Aviso Legal
-
-Esta análise tem caráter informativo e não substitui orientação financeira profissional.
-
----
-
-## 🔍 Observabilidade (nível avançado)
-
-Este projeto também possui infraestrutura para monitoramento com:
-
-* Prometheus
-* Grafana
-
----
-
-## 🚀 Como subir os containers
-
-```bash
+```powershell
 docker-compose up --build
 ```
 
----
+Serviços:
 
-## 📊 Acessando os serviços
+- API: `http://localhost:8000/docs`
+- Prometheus: `http://localhost:9090`
+- Grafana: `http://localhost:3000`
 
-### API FastAPI
+Credenciais padrão do Grafana:
 
-```
-* http://localhost:8000/docs
+- usuário: `admin`
+- senha: `admin`
 
-* http://localhost:8000/health
+## Valor de portfólio
 
-* http://localhost:8000/metrics
+Este projeto demonstra, de forma prática:
 
-```
+- desenho de produto com foco em experiência e utilidade
+- backend Python estruturado para produção
+- integração entre frontend e API
+- disciplina de testes e cobertura
+- preocupação real com segurança de dependências
+- maturidade de CI voltada para estabilidade, rastreabilidade e prevenção de regressões
 
-### Prometheus
+Mais do que um MVP funcional, Financial IA representa uma aplicação construída com atenção tanto ao que o usuário final enxerga quanto ao que sustenta a operação por trás.
 
-```
-* http://localhost:9090 
+## O que eu construí e o que aprendi
 
-```
+Ao desenvolver este projeto, construí uma aplicação full stack capaz de transformar entradas financeiras simples em um diagnóstico com score, classificação e recomendação. Além da entrega funcional, estruturei o projeto com preocupações reais de engenharia, incluindo testes automatizados, cobertura, observabilidade, análise estática e auditoria de dependências.
 
----
+Durante a evolução da aplicação, aprofundei meu entendimento sobre integração entre frontend e backend, organização de dependências Python, uso de lockfiles para reprodutibilidade, endurecimento de pipeline no GitHub Actions e redução de fragilidade operacional no CI. Também aprendi, na prática, a tratar segurança e confiabilidade como parte do produto, e não como etapas isoladas no fim do desenvolvimento.
 
-### Grafana
+O resultado final não representa apenas uma interface funcional ou uma API disponível, mas uma base mais madura, auditável e preparada para evolução contínua.
 
-```
-* http://localhost:3000
+## Status atual
 
-Usuário: admin
-Senha: admin
+- aplicação funcional com frontend e backend integrados
+- pipeline de CI consolidado
+- lockfiles versionados e auditados
+- observabilidade disponível para ambiente local
+- base pronta para evolução de produto e endurecimento operacional contínuo
 
-```
+## Aviso legal
 
----
-
-## 📈 Dashboards
-
-```json
-{
-  "title": "Financial IA Dashboard",
-  "panels": [
-    {
-      "type": "stat",
-      "title": "Total de Predições",
-      "targets": [{ "expr": "prediction_total" }],
-      "gridPos": { "x": 0, "y": 0, "w": 8, "h": 6 }
-    },
-    {
-      "type": "stat",
-      "title": "Erros de Predição",
-      "targets": [{ "expr": "prediction_errors_total" }],
-      "gridPos": { "x": 8, "y": 0, "w": 8, "h": 6 }
-    },
-    {
-      "type": "barchart",
-      "title": "Estado do Modelo",
-      "targets": [{ "expr": "model_state_total" }],
-      "gridPos": { "x": 0, "y": 6, "w": 16, "h": 8 }
-    }
-  ]
-}
-```
-
----
-
-## 📌 Status do Projeto
-
-✔ MVP funcional (frontend + backend)
-✔ Integração completa
-✔ Observabilidade com Prometheus/Grafana
-⬜ Persistência de dados
-
----
-
-## 🎯 Próximos passos
-
-* Persistência de diagnósticos
-* Dashboard analítico
-* Deploy em nuvem
+Esta aplicação tem caráter informativo e não substitui orientação financeira profissional.
