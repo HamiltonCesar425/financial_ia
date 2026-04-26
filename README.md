@@ -11,6 +11,7 @@ Além da experiência do usuário, o projeto foi estruturado com foco em qualida
 - backend em FastAPI com rotas de aplicação, saúde e métricas
 - frontend em React/Vite para interação rápida e objetiva
 - motor de cálculo com classificação e recomendação financeira
+- camada adicional de diagnóstico estruturado via JSON e CSV
 - observabilidade com Prometheus e Grafana
 - suíte de testes automatizados com cobertura acima do mínimo exigido
 - auditoria de dependências com `pip-audit` baseada em lockfiles
@@ -23,6 +24,8 @@ O usuário informa dados financeiros essenciais e recebe:
 - score financeiro
 - classificação do cenário
 - recomendação prática
+- diagnóstico estruturado por rota dedicada
+- suporte a envio de dados também por arquivo CSV
 
 Isso torna o projeto útil tanto como MVP de produto quanto como demonstração técnica de uma aplicação Python moderna com frontend integrado.
 
@@ -36,7 +39,12 @@ Isso torna o projeto útil tanto como MVP de produto quanto como demonstração 
 │   ├── api/
 │   │   ├── app.py
 │   │   ├── business_metrics.py
+│   │   ├── routes/
+│   │   │   └── diagnosis.py
 │   │   └── schemas.py
+│   ├── domain/
+│   │   ├── diagnosis_service.py
+│   │   └── insights_service.py
 │   ├── observability/
 │   │   ├── http_metrics_middleware.py
 │   │   └── registry.py
@@ -112,6 +120,12 @@ Rotas locais:
 - `http://localhost:8000/docs`
 - `http://localhost:8000/metrics`
 
+Principais endpoints:
+
+- `POST /score`
+- `POST /diagnosis`
+- `POST /upload/csv`
+
 ### 4. Subir o frontend
 
 ```powershell
@@ -133,6 +147,40 @@ VITE_API_URL=https://financial-ia.onrender.com
 ```
 
 Se `VITE_API_URL` não estiver definida, o frontend usa `http://localhost:8000`.
+
+## Fluxos de diagnóstico
+
+Além da rota principal de score, a aplicação também oferece um fluxo de diagnóstico dedicado.
+
+### Diagnóstico via JSON
+
+Envia receita e despesas diretamente:
+
+```json
+{
+  "receita": 1000,
+  "despesas": 400
+}
+```
+
+Resposta esperada:
+
+```json
+{
+  "score": 60,
+  "message": "Situação estável",
+  "recommendation": "Otimizar investimentos"
+}
+```
+
+### Diagnóstico via CSV
+
+O endpoint `POST /upload/csv` aceita arquivos com colunas:
+
+- `receita` e `despesas`
+- ou `income` e `expenses`
+
+Isso permite evoluir a aplicação para cenários de ingestão simples sem quebrar a consistência do domínio.
 
 ## Qualidade, testes e segurança
 
@@ -247,6 +295,9 @@ O projeto inclui instrumentação para monitoramento local com:
 Organização atual:
 
 - `src/api/business_metrics.py`: métricas de negócio e métricas usadas pelo fluxo principal da API
+- `src/api/routes/diagnosis.py`: rotas dedicadas ao fluxo de diagnóstico e upload CSV
+- `src/domain/diagnosis_service.py`: regra de domínio para composição do diagnóstico
+- `src/domain/insights_service.py`: geração de mensagem e recomendação a partir do score
 - `src/observability/registry.py`: registro central de métricas transversais de observabilidade
 - `src/observability/http_metrics_middleware.py`: middleware de instrumentação HTTP
 
@@ -274,6 +325,7 @@ Este projeto demonstra, de forma prática:
 - desenho de produto com foco em experiência e utilidade
 - backend Python estruturado para produção
 - integração entre frontend e API
+- separação entre camada de rota, schema e domínio
 - disciplina de testes e cobertura
 - preocupação real com segurança de dependências
 - maturidade de CI voltada para estabilidade, rastreabilidade e prevenção de regressões
@@ -284,13 +336,14 @@ Mais do que um MVP funcional, Financial IA representa uma aplicação construíd
 
 Ao desenvolver este projeto, construí uma aplicação full stack capaz de transformar entradas financeiras simples em um diagnóstico com score, classificação e recomendação. Além da entrega funcional, estruturei o projeto com preocupações reais de engenharia, incluindo testes automatizados, cobertura, observabilidade, análise estática e auditoria de dependências.
 
-Durante a evolução da aplicação, aprofundei meu entendimento sobre integração entre frontend e backend, organização de dependências Python, uso de lockfiles para reprodutibilidade, endurecimento de pipeline no GitHub Actions e redução de fragilidade operacional no CI. Também aprendi, na prática, a tratar segurança e confiabilidade como parte do produto, e não como etapas isoladas no fim do desenvolvimento.
+Durante a evolução da aplicação, aprofundei meu entendimento sobre integração entre frontend e backend, organização de dependências Python, uso de lockfiles para reprodutibilidade, endurecimento de pipeline no GitHub Actions, modelagem de contratos com Pydantic e separação entre rotas, serviço de domínio e observabilidade. Também aprendi, na prática, a tratar segurança e confiabilidade como parte do produto, e não como etapas isoladas no fim do desenvolvimento.
 
 O resultado final não representa apenas uma interface funcional ou uma API disponível, mas uma base mais madura, auditável e preparada para evolução contínua.
 
 ## Status atual
 
 - aplicação funcional com frontend e backend integrados
+- fluxo adicional de diagnóstico estruturado disponível via JSON e CSV
 - pipeline de CI consolidado
 - lockfiles versionados e auditados
 - observabilidade disponível para ambiente local
