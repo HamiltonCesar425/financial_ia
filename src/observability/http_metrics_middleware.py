@@ -4,7 +4,7 @@ import time
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 
-from src.observability.metrics import (
+from src.observability.registry import (
     http_request_count,
     http_request_latency,
 )

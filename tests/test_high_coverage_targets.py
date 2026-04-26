@@ -5,7 +5,7 @@ import pytest
 import requests
 
 from src.api import app as api_app
-from src.api.metrics import (
+from src.api.business_metrics import (
     CLASSIFICACAO_MAP,
     RECOMENDACAO_MAP,
     _normalize_category,

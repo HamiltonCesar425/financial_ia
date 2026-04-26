@@ -6,7 +6,12 @@ from starlette.middleware.cors import CORSMiddleware
 import src.core.health_score as health_score
 
 from src.api.schemas import ScoreResponse, ScoreRequest
-from src.api.metrics import update_metrics, PREDICTION_REQUESTS, PREDICTION_LATENCY, REQUEST_COUNT
+from src.api.business_metrics import (
+    PREDICTION_LATENCY,
+    PREDICTION_REQUESTS,
+    REQUEST_COUNT,
+    update_metrics,
+)
 from src.core.logging import setup_logging
 
 # ======================================

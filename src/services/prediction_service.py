@@ -1,6 +1,6 @@
 from typing import List, Dict, Any
 from src.engine.calculation_engine import FinancialHealthEngine
-from src.observability.metrics import model_state_counter
+from src.observability.registry import model_state_counter
 
 
 engine = FinancialHealthEngine()

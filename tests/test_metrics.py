@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 from src.main import app
-from src.api.metrics import receita_metric, despesas_metric, divida_metric
+from src.api.business_metrics import receita_metric, despesas_metric, divida_metric
 
 client = TestClient(app)
 

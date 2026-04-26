@@ -33,6 +33,14 @@ Isso torna o projeto útil tanto como MVP de produto quanto como demonstração 
 ├── .github/workflows/ci.yml
 ├── frontend/
 ├── src/
+│   ├── api/
+│   │   ├── app.py
+│   │   ├── business_metrics.py
+│   │   └── schemas.py
+│   ├── observability/
+│   │   ├── http_metrics_middleware.py
+│   │   └── registry.py
+│   └── ...
 ├── tests/
 ├── requirements.txt
 ├── requirements-dev.txt
@@ -235,6 +243,12 @@ O projeto inclui instrumentação para monitoramento local com:
 
 - Prometheus
 - Grafana
+
+Organização atual:
+
+- `src/api/business_metrics.py`: métricas de negócio e métricas usadas pelo fluxo principal da API
+- `src/observability/registry.py`: registro central de métricas transversais de observabilidade
+- `src/observability/http_metrics_middleware.py`: middleware de instrumentação HTTP
 
 Subida com containers:
 
