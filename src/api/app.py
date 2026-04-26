@@ -1,5 +1,7 @@
+# app.py
 import time
 from fastapi import FastAPI, APIRouter, HTTPException
+from src.api.routes.diagnosis import router as diagnosis_router
 from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.middleware.cors import CORSMiddleware
 
@@ -24,6 +26,7 @@ logger.info("Router de API inicializado")
 # App + Router
 # ======================================
 app = FastAPI(title="Financial AI")
+
 router = APIRouter(prefix="", tags=["Financial AI"])
 
 app.add_middleware(
@@ -163,3 +166,4 @@ def calcular_score(payload: ScoreRequest) -> ScoreResponse:
 # Router
 # ======================================
 app.include_router(router)
+app.include_router(diagnosis_router)
