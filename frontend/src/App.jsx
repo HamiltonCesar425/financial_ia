@@ -1,12 +1,11 @@
 import { useState } from "react";
-import HeroSection from "./components/HeroSection";
-import ValueHighlights from "./components/ValueHighlights";
-import ScoreForm from "./components/ScoreForm";
 import ResultCard from "./components/ResultCard";
-import ErrorNotice from "./components/ErrorNotice";
 import { calculateScore } from "./services/api";
+import Landing from "./features/essential-diagnosis/pages/Landing";
+import DataCollection from "./features/essential-diagnosis/pages/DataCollection";
 
 export default function App() {
+  const [step, setStep] = useState("landing");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
@@ -20,12 +19,7 @@ export default function App() {
       const response = await calculateScore(data);
       setResult(response.data);
       setLastPayload(data);
-
-      setTimeout(() => {
-        document.getElementById("result")?.scrollIntoView({
-          behavior: "smooth",
-        });
-      }, 100);
+      setStep("result");
     } catch (err) {
       if (err.response?.status === 422) {
         setError("Dados inválidos. Verifique os campos.");
@@ -39,39 +33,28 @@ export default function App() {
     }
   };
 
-  return (
-    <div className="page-shell">
-      <main className="page-content">
-        <HeroSection />
-        <ValueHighlights />
-        <section className="card panel-section">
-          <div className="section-heading">
-            <span className="eyebrow">Analise agora</span>
-            <h2>Receba seu diagnostico financeiro</h2>
-            <p>
-              Preencha os campos abaixo para calcular seu score, entender sua
-              classificacao e receber uma recomendacao pratica.
-            </p>
-          </div>
-          <ErrorNotice message={error} />
-          <ScoreForm onSubmit={handleSubmit} loading={loading} />
-        </section>
-        <div id="result">
-          <ResultCard
-            result={result}
-            requestData={lastPayload}
-            onReset={() => {
-              setResult(null);
-              setLastPayload(null);
-              setError(null);
-            }}
-          />
-        </div>
-      </main>
-      <footer className="footer-note">
-        Diagnostico Financeiro Automatizado. Esta analise tem carater
-        informativo e nao substitui orientacao financeira profissional.
-      </footer>
-    </div>
-  );
+  if (step === "landing") {
+    return <Landing onStart={() => setStep("collection")} />;
+  }
+
+  if (step === "collection") {
+    return (
+      <DataCollection
+        onSubmit={handleSubmit}
+        loading={loading}
+        error={error}
+      />
+    );
+  }
+
+  if (step === "result") {
+    return (
+      <ResultCard
+        result={result}
+        payload={lastPayload}
+      />
+    );
+  }
+
+  return null;
 }
