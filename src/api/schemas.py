@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field, ConfigDict, field_validator
 from typing import List, Literal
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 # ==============================
@@ -40,35 +41,21 @@ class ReceitaInput(BaseModel):
 # INPUT - API de scoring
 # ==============================
 class ScoreRequest(BaseModel):
-    receita: float = Field(..., gt=0, description="Receita deve ser maior que zero")
-    despesas: float = Field(..., ge=0, description="Despesas não podem ser negativas")
-    divida: float = Field(..., ge=0, description="Dívida não pode ser negativa")
-
-    model_config = ConfigDict(extra="forbid")
-
-
-# ==============================
-# INPUT - Diagnóstico
-# ==============================
-class DiagnosisRequest(BaseModel):
-    receita: float = Field(..., gt=0, description="Receita deve ser maior que zero")
-    despesas: float = Field(..., ge=0, description="Despesas não podem ser negativas")
-
-    model_config = ConfigDict(extra="forbid")
-
-    @field_validator("despesas")
-    @classmethod
-    def expenses_not_greater_than_income(cls, v, values):
-        receita = values.data.get("receita")
-        if receita is not None and v > receita:
-            raise ValueError("Despesas não podem ser maiores que a receita")
-        return v
-
-
-class DiagnosisResponse(BaseModel):
-    score: int = Field(..., ge=0, le=100, description="Score do diagnóstico")
-    message: str = Field(..., min_length=3, description="Mensagem principal do diagnóstico")
-    recommendation: str = Field(..., min_length=3, description="Recomendação principal")
+    receita: float = Field(
+        ...,
+        gt=0,
+        description="Receita deve ser maior que zero",
+    )
+    despesas: float = Field(
+        ...,
+        ge=0,
+        description="Despesas não podem ser negativas",
+    )
+    divida: float = Field(
+        ...,
+        ge=0,
+        description="Dívida não pode ser negativa",
+    )
 
     model_config = ConfigDict(extra="forbid")
 
@@ -84,10 +71,12 @@ class ScoreResponse(BaseModel):
         description="Score financeiro calculado (0 a 100)",
     )
 
-    classificacao: Literal["Saudável", "Estável", "Risco", "Crítico"] = Field(
-        ...,
-        description="Classificação do perfil financeiro",
-    )
+    classificacao: Literal[
+        "Saudável",
+        "Estável",
+        "Risco",
+        "Crítico",
+    ]
 
     recomendacao: str = Field(
         ...,
@@ -96,3 +85,75 @@ class ScoreResponse(BaseModel):
     )
 
     model_config = ConfigDict(extra="forbid")
+
+
+# ==============================
+# INPUT - Diagnóstico
+# ==============================
+class DiagnosisRequest(BaseModel):
+    receita: float = Field(..., gt=0)
+    despesas: float = Field(..., ge=0)
+    divida: float = Field(..., ge=0)
+    reserva: float = Field(..., ge=0)
+
+    model_config = ConfigDict(extra="forbid")
+
+    @field_validator("despesas")
+    @classmethod
+    def expenses_not_greater_than_income(cls, v, values):
+        receita = values.data.get("receita")
+        if receita is not None and v > receita:
+            raise ValueError("Despesas não podem ser maiores que a receita")
+        return v
+
+
+# ==============================
+# OUTPUT - Diagnóstico
+# ==============================
+class DiagnosisResponse(BaseModel):
+    score: int = Field(..., ge=0, le=100)
+
+    classification: Literal[
+        "Crítico",
+        "Atenção",
+        "Estável",
+        "Saudável",
+    ]
+
+    diagnosis: str = Field(..., min_length=10)
+
+    alerts: List[str] = Field(
+        ...,
+        min_length=3,
+        max_length=3,
+    )
+
+    recommendations: List[str] = Field(
+        ...,
+        min_length=3,
+        max_length=3,
+    )
+
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={
+            "example": {
+                "score": 74,
+                "classification": "Estável",
+                "diagnosis": (
+                    "Sua saúde financeira apresenta estabilidade moderada, "
+                    "mas exige atenção preventiva."
+                ),
+                "alerts": [
+                    "Reserva abaixo do ideal",
+                    "Comprometimento parcial da renda",
+                    "Baixa margem para imprevistos",
+                ],
+                "recommendations": [
+                    "Reduzir despesas variáveis em 8%",
+                    "Construir reserva de emergência",
+                    "Revisar gastos recorrentes",
+                ],
+            }
+        },
+    )

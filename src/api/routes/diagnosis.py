@@ -74,6 +74,8 @@ async def upload_csv(file: UploadFile = File(...)) -> DiagnosisResponse:
         data = DiagnosisRequest(
             receita=float(df["receita"].sum()),
             despesas=float(df["despesas"].sum()),
+            divida=0.0,
+            reserva=0.0,
         )
         result = generate_diagnosis(data.model_dump())
     except ValueError as exc:
