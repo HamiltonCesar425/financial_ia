@@ -1,6 +1,8 @@
 import { useState } from "react";
+
 import ResultCard from "./components/ResultCard";
-import { calculateScore } from "./services/api";
+import { generateDiagnosis } from "./services/api";
+
 import Landing from "./features/essential-diagnosis/pages/Landing";
 import DataCollection from "./features/essential-diagnosis/pages/DataCollection";
 
@@ -16,15 +18,16 @@ export default function App() {
     setError(null);
 
     try {
-      const response = await calculateScore(data);
-      setResult(response.data);
+      const response = await generateDiagnosis(data);
+
+      setResult(response);
       setLastPayload(data);
       setStep("result");
     } catch (err) {
       if (err.response?.status === 422) {
-        setError("Dados inválidos. Verifique os campos.");
+        setError("Dados inválidos. Revise os campos informados.");
       } else if (err.response?.status === 500) {
-        setError("Erro interno. Tente novamente.");
+        setError("Erro interno do servidor.");
       } else {
         setError("Falha de conexão com o servidor.");
       }
@@ -51,7 +54,12 @@ export default function App() {
     return (
       <ResultCard
         result={result}
-        payload={lastPayload}
+        requestData={lastPayload}
+        onReset={() => {
+          setResult(null);
+          setLastPayload(null);
+          setStep("collection");
+        }}
       />
     );
   }

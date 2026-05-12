@@ -12,23 +12,41 @@ export default function ResultCard({ result, requestData, onReset }) {
     <section className="card result-card">
       <div className="section-heading">
         <span className="eyebrow">Resultado</span>
-        <h2>Seu diagnostico financeiro</h2>
+        <h2>Seu diagnóstico financeiro</h2>
       </div>
 
       <div className={`score-hero ${getTone(result.score)}`}>
         <span className="score-label">Score financeiro</span>
-        <strong>{result.score.toFixed(2)}</strong>
+        <strong>{result.score}</strong>
       </div>
 
       <div className="result-meta">
         <span className={`badge ${getTone(result.score)}`}>
-          {result.classificacao}
+          {result.classification}
         </span>
       </div>
 
       <div className="result-copy">
-        <h3>Recomendacao pratica</h3>
-        <p>{result.recomendacao}</p>
+        <h3>Diagnóstico</h3>
+        <p>{result.diagnosis}</p>
+      </div>
+
+      <div className="result-copy">
+        <h3>Alertas principais</h3>
+        <ul>
+          {result.alerts.map((alert, index) => (
+            <li key={`${alert}-${index}`}>{alert}</li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="result-copy">
+        <h3>Recomendações práticas</h3>
+        <ul>
+          {result.recommendations.map((recommendation, index) => (
+            <li key={`${recommendation}-${index}`}>{recommendation}</li>
+          ))}
+        </ul>
       </div>
 
       {requestData ? (
@@ -44,8 +62,12 @@ export default function ResultCard({ result, requestData, onReset }) {
               <dd>{requestData.despesas}</dd>
             </div>
             <div>
-              <dt>Divida</dt>
+              <dt>Dívida</dt>
               <dd>{requestData.divida}</dd>
+            </div>
+            <div>
+              <dt>Reserva</dt>
+              <dd>{requestData.reserva}</dd>
             </div>
           </dl>
         </div>
@@ -60,7 +82,7 @@ export default function ResultCard({ result, requestData, onReset }) {
       </button>
 
       <p className="legal-note">
-        Esta analise tem carater informativo e nao substitui orientacao
+        Esta análise tem caráter informativo e não substitui orientação
         financeira profissional.
       </p>
     </section>

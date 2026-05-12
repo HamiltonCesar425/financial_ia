@@ -5,7 +5,9 @@ export default function ScoreForm({ onSubmit, loading }) {
     receita: "",
     despesas: "",
     divida: "",
+    reserva: "",
   });
+
   const [errors, setErrors] = useState({});
 
   const fields = [
@@ -13,38 +15,55 @@ export default function ScoreForm({ onSubmit, loading }) {
       id: "receita",
       label: "Receita mensal",
       placeholder: "5000",
-      helper: "A receita deve ser maior que zero.",
+      helper: "Informe sua entrada financeira mensal principal.",
     },
     {
       id: "despesas",
       label: "Despesas mensais",
       placeholder: "3000",
-      helper: "Despesas podem ser zero, mas nao negativas.",
+      helper: "Some seus custos fixos e recorrentes.",
     },
     {
       id: "divida",
-      label: "Divida atual",
+      label: "Dívida atual",
       placeholder: "1000",
-      helper: "Informe o total atual da sua divida.",
+      helper: "Inclua financiamentos, empréstimos e parcelamentos.",
+    },
+    {
+      id: "reserva",
+      label: "Reserva financeira",
+      placeholder: "2000",
+      helper: "Valor disponível para emergências ou liquidez imediata.",
     },
   ];
 
   const validate = () => {
     const nextErrors = {};
+
     const receita = Number(formData.receita);
     const despesas = Number(formData.despesas);
     const divida = Number(formData.divida);
+    const reserva = Number(formData.reserva);
 
     if (formData.receita === "" || Number.isNaN(receita) || receita <= 0) {
-      nextErrors.receita = "Informe sua receita. Ela deve ser maior que zero.";
+      nextErrors.receita = "Informe uma receita válida.";
     }
 
     if (formData.despesas === "" || Number.isNaN(despesas) || despesas < 0) {
-      nextErrors.despesas = "Informe despesas validas. Elas nao podem ser negativas.";
+      nextErrors.despesas = "Informe despesas válidas.";
     }
 
     if (formData.divida === "" || Number.isNaN(divida) || divida < 0) {
-      nextErrors.divida = "Informe a divida atual. Ela nao pode ser negativa.";
+      nextErrors.divida = "Informe uma dívida válida.";
+    }
+
+    if (formData.reserva === "" || Number.isNaN(reserva) || reserva < 0) {
+      nextErrors.reserva = "Informe uma reserva válida.";
+    }
+
+    if (despesas > receita) {
+      nextErrors.despesas =
+        "As despesas não podem ultrapassar sua receita mensal.";
     }
 
     setErrors(nextErrors);
@@ -52,8 +71,15 @@ export default function ScoreForm({ onSubmit, loading }) {
   };
 
   const handleChange = (field, value) => {
-    setFormData((current) => ({ ...current, [field]: value }));
-    setErrors((current) => ({ ...current, [field]: undefined }));
+    setFormData((current) => ({
+      ...current,
+      [field]: value,
+    }));
+
+    setErrors((current) => ({
+      ...current,
+      [field]: undefined,
+    }));
   };
 
   const handleSubmit = (event) => {
@@ -67,6 +93,7 @@ export default function ScoreForm({ onSubmit, loading }) {
       receita: Number(formData.receita),
       despesas: Number(formData.despesas),
       divida: Number(formData.divida),
+      reserva: Number(formData.reserva),
     });
   };
 
@@ -75,17 +102,18 @@ export default function ScoreForm({ onSubmit, loading }) {
       {fields.map((field) => (
         <label key={field.id} className="field-group">
           <span>{field.label}</span>
+
           <input
             inputMode="decimal"
-            min="0"
             name={field.id}
             placeholder={field.placeholder}
-            step="any"
-            type="number"
+            type="text"
             value={formData[field.id]}
             onChange={(event) => handleChange(field.id, event.target.value)}
           />
+
           <small>{field.helper}</small>
+
           {errors[field.id] ? (
             <p className="field-error">{errors[field.id]}</p>
           ) : null}
@@ -93,7 +121,7 @@ export default function ScoreForm({ onSubmit, loading }) {
       ))}
 
       <button className="primary-button" disabled={loading} type="submit">
-        {loading ? "Analisando seus dados..." : "Calcular meu score"}
+        {loading ? "Analisando..." : "Calcular meu diagnóstico"}
       </button>
     </form>
   );

@@ -1,3 +1,72 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+    margin: 0;
+    font-family: Inter, system-ui sans-serif;
+    background: #f5f7fb;
+    color: #111827;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+.score-form {
+    display: grid;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+.field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.field-group span {
+    font-weight: 600;
+}
+
+.field-group input {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 12px;
+    font-size: 1rem;
+    outline: none;
+}
+
+.field-group input:focus {
+    border-color: #2563eb;
+}
+
+.field-group small {
+    color: #6b7280;
+}
+
+.field-error {
+    color: #dc2626;
+    font-size: 0.875rem;
+}
+
+.primary-button {
+    width: 100%;
+    padding: 1rem;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.primary-button:houver {
+    background: #1d4ed8;
+    }
+
+.primary-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}

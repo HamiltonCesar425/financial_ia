@@ -22,7 +22,7 @@ export default function DataCollection({ onSubmit, loading, error }) {
 
         <ScoreForm onSubmit={onSubmit} loading={loading} />
 
-        {error && <ErrorNotice message={error} />}
+        {error ? <ErrorNotice message={error} /> : null}
 
       </div>
     </div>

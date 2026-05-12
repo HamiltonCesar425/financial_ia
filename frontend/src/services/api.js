@@ -5,5 +5,11 @@ const instance = axios.create({
 });
 
 export const calculateScore = async (payload) => {
-  return instance.post("/score", payload);
+  const response = await instance.post("/score", payload);
+  return response.data;
+};
+
+export const generateDiagnosis = async (payload) => {
+  const response = await instance.post("/diagnosis", payload);
+  return response.data;
 };
