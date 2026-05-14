@@ -229,3 +229,30 @@ body {
     color: #6b7280;
     text-align: center;
 }
+
+.history-card {
+    margin-top: 2rem;
+}
+
+.history-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.history-item {
+    padding: 1rem;
+    border-radius: 14px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+}
+
+.history-item strong {
+    font-size: 1.5rem;
+    margin-right: 0.75rem;
+}
+
+.history-item small {
+    display: block;
+    margin: 0.5rem 0;
+    color: #6b7280;
+}

@@ -6,6 +6,7 @@ import { generateDiagnosis } from "./services/api";
 import Landing from "./features/essential-diagnosis/pages/Landing";
 import DataCollection from "./features/essential-diagnosis/pages/DataCollection";
 import {saveAnalysis } from "./utils/historyStorage";
+import HistoryPanel from "./components/HistoryPanel";
 
 export default function App() {
   const [step, setStep] = useState("landing");
@@ -54,16 +55,20 @@ export default function App() {
 
   if (step === "result") {
     return (
+    <>
       <ResultCard
         result={result}
         requestData={lastPayload}
         onReset={() => {
           setResult(null);
           setLastPayload(null);
-          setStep("collection");        
+          setStep("collection");
         }}
       />
-    );
+
+      <HistoryPanel />
+    </>
+);
   }
 
   return null;
