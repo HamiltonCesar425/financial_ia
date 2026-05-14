@@ -5,6 +5,7 @@ import { generateDiagnosis } from "./services/api";
 
 import Landing from "./features/essential-diagnosis/pages/Landing";
 import DataCollection from "./features/essential-diagnosis/pages/DataCollection";
+import {saveAnalysis } from "./utils/historyStorage";
 
 export default function App() {
   const [step, setStep] = useState("landing");
@@ -22,6 +23,7 @@ export default function App() {
 
       setResult(response);
       setLastPayload(data);
+      saveAnalysis(response, data);
       setStep("result");
     } catch (err) {
       if (err.response?.status === 422) {
@@ -58,7 +60,7 @@ export default function App() {
         onReset={() => {
           setResult(null);
           setLastPayload(null);
-          setStep("collection");
+          setStep("collection");        
         }}
       />
     );

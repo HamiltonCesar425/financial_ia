@@ -1,6 +1,15 @@
 export default function ResultCard({ result, requestData, onReset }) {
   if (!result) return null;
 
+  const uniqueAlerts = [...new Set(result.alerts)];
+  const uniqueRecommendations = [...new Set(result.recommendations)];
+
+  const formatCurrency = (value) =>
+    new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(value);
+
   const getTone = (score) => {
     if (score < 40) return "danger";
     if (score < 60) return "warning";
@@ -34,7 +43,7 @@ export default function ResultCard({ result, requestData, onReset }) {
       <div className="result-copy">
         <h3>Alertas principais</h3>
         <ul>
-          {result.alerts.map((alert, index) => (
+          {uniqueAlerts.map((alert, index) => (
             <li key={`${alert}-${index}`}>{alert}</li>
           ))}
         </ul>
@@ -43,7 +52,7 @@ export default function ResultCard({ result, requestData, onReset }) {
       <div className="result-copy">
         <h3>Recomendações práticas</h3>
         <ul>
-          {result.recommendations.map((recommendation, index) => (
+          {uniqueRecommendations.map((recommendation, index) => (
             <li key={`${recommendation}-${index}`}>{recommendation}</li>
           ))}
         </ul>
@@ -55,19 +64,19 @@ export default function ResultCard({ result, requestData, onReset }) {
           <dl>
             <div>
               <dt>Receita</dt>
-              <dd>{requestData.receita}</dd>
+              <dd>{formatCurrency(requestData.receita)}</dd>
             </div>
             <div>
               <dt>Despesas</dt>
-              <dd>{requestData.despesas}</dd>
+              <dd>{formatCurrency(requestData.despesas)}</dd>
             </div>
             <div>
               <dt>Dívida</dt>
-              <dd>{requestData.divida}</dd>
+              <dd>{formatCurrency(requestData.divida)}</dd>
             </div>
             <div>
               <dt>Reserva</dt>
-              <dd>{requestData.reserva}</dd>
+              <dd>{formatCurrency(requestData.reserva)}</dd>
             </div>
           </dl>
         </div>
