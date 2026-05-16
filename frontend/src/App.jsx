@@ -8,7 +8,6 @@ import ScoreHistoryChart from "./features/essential-diagnosis/components/ScoreHi
 import DataCollection from "./features/essential-diagnosis/pages/DataCollection"
 import Landing from "./features/essential-diagnosis/pages/Landing"
 import { getHistory, saveAnalysis } from "./utils/historyStorage"
-import { analyzeHistory } from "./utils/insightEngine"
 
 export default function App() {
   const [step, setStep] = useState("landing")
@@ -17,7 +16,7 @@ export default function App() {
   const [error, setError] = useState(null)
   const [lastPayload, setLastPayload] = useState(null)
   const history = getHistory()
-  const insight = analyzeHistory(history) || {
+  const insight = result?.insights || {
     message: "Análise indisponível.",
   }
 
@@ -34,7 +33,10 @@ export default function App() {
     setError(null)
 
     try {
-      const response = await generateDiagnosis(data)
+      const response = await generateDiagnosis({
+        ...data,
+        history,
+      })
 
       setResult(response)
       setLastPayload(data)
@@ -68,7 +70,7 @@ export default function App() {
           <h3 className="text-ig font-semibold text-slate-800 mb-2">
             Análise Evolutiva
           </h3>
-          <p clasName="text-slate-600 leading-relaxed">
+          <p className="text-slate-600 leading-relaxed">
             {insight.message}
           </p>
         </div>

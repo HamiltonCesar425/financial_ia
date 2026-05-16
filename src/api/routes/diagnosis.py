@@ -1,11 +1,13 @@
 # src/api/routes/diagnosis.py
 
 import time
+from datetime import datetime, timezone
 
 import pandas as pd
 from fastapi import APIRouter, File, HTTPException, UploadFile
 
 from src.api.schemas import DiagnosisRequest, DiagnosisResponse
+from src.app.services.insight_engine import generate_insights
 from src.domain.diagnosis_service import generate_diagnosis
 from src.observability.registry import diagnosis_generated, diagnosis_latency
 
@@ -36,12 +38,31 @@ def _normalize_csv_columns(df: pd.DataFrame) -> pd.DataFrame:
     return df.rename(columns=normalized_columns)
 
 
-@router.post("/diagnosis", response_model=DiagnosisResponse)
+@router.post(
+    "/diagnosis",
+    response_model=DiagnosisResponse,
+    response_model_exclude_none=True,
+)
 def diagnosis_endpoint(payload: DiagnosisRequest) -> DiagnosisResponse:
     start_time = time.perf_counter()
 
     try:
-        result = generate_diagnosis(payload.model_dump())
+        result = generate_diagnosis(payload.model_dump(exclude={"history"}))
+        if payload.history is not None:
+            history = [
+                {
+                    "score": item.score,
+                    "created_at": item.created_at or item.timestamp,
+                }
+                for item in payload.history
+            ]
+            history.append(
+                {
+                    "score": result["score"],
+                    "created_at": datetime.now(timezone.utc),
+                }
+            )
+            result["insights"] = generate_insights(history)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except Exception as exc:
@@ -55,7 +76,11 @@ def diagnosis_endpoint(payload: DiagnosisRequest) -> DiagnosisResponse:
     return DiagnosisResponse(**result)
 
 
-@router.post("/upload/csv", response_model=DiagnosisResponse)
+@router.post(
+    "/upload/csv",
+    response_model=DiagnosisResponse,
+    response_model_exclude_none=True,
+)
 async def upload_csv(file: UploadFile = File(...)) -> DiagnosisResponse:
     start_time = time.perf_counter()
 
@@ -77,7 +102,7 @@ async def upload_csv(file: UploadFile = File(...)) -> DiagnosisResponse:
             divida=0.0,
             reserva=0.0,
         )
-        result = generate_diagnosis(data.model_dump())
+        result = generate_diagnosis(data.model_dump(exclude={"history"}))
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except Exception as exc:

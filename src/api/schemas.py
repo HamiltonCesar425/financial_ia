@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
@@ -90,11 +91,20 @@ class ScoreResponse(BaseModel):
 # ==============================
 # INPUT - Diagnóstico
 # ==============================
+class InsightHistoryItem(BaseModel):
+    score: float = Field(..., ge=0, le=100)
+    created_at: datetime | None = None
+    timestamp: datetime | None = None
+
+    model_config = ConfigDict(extra="ignore")
+
+
 class DiagnosisRequest(BaseModel):
     receita: float = Field(..., gt=0)
     despesas: float = Field(..., ge=0)
     divida: float = Field(..., ge=0)
     reserva: float = Field(..., ge=0)
+    history: List[InsightHistoryItem] | None = None
 
     model_config = ConfigDict(extra="forbid")
 
@@ -110,6 +120,21 @@ class DiagnosisRequest(BaseModel):
 # ==============================
 # OUTPUT - Diagnóstico
 # ==============================
+class InsightResponse(BaseModel):
+    status: str
+    trend: str
+    volatility: str
+    change_speed: str
+    message: str
+    pattern: str | None = None
+    delta: float | int = 0
+    first_score: float | None = None
+    last_score: float | None = None
+    analyses_count: int | None = None
+
+    model_config = ConfigDict(extra="forbid")
+
+
 class DiagnosisResponse(BaseModel):
     score: int = Field(..., ge=0, le=100)
 
@@ -133,6 +158,8 @@ class DiagnosisResponse(BaseModel):
         min_length=3,
         max_length=3,
     )
+
+    insights: InsightResponse | None = None
 
     model_config = ConfigDict(
         extra="forbid",
