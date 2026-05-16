@@ -80,8 +80,7 @@ body {
 }
 
 .card {
-    width: 100%;
-    max-width: 920px;
+    width: min(100%, 1400px);
     background: white;
     border-radius: 24px;
     padding: 3rem;

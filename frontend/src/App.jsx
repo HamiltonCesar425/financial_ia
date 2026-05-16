@@ -58,7 +58,7 @@ export default function App() {
 
   if (step === "result") {
     return (
-      <div className="max-w-4x1 mx-auto px-4 py-8 space-y-8">
+      <div className="w-full">
         <ResultCard
           result={result}
           requestData={lastPayload}
