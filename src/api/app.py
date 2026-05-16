@@ -5,6 +5,7 @@ from src.api.routes.diagnosis import router as diagnosis_router
 from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.middleware.cors import CORSMiddleware
 
+
 import src.core.health_score as health_score
 
 from src.api.schemas import ScoreResponse, ScoreRequest
@@ -65,9 +66,6 @@ def root():
 @app.get("/health", summary="Health check")
 def health():
     return {"status": "ok"}
-
-
-
 
 
 # ======================================
