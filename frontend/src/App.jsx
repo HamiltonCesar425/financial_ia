@@ -15,7 +15,9 @@ export default function App() {
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
   const [lastPayload, setLastPayload] = useState(null)
+
   const history = getHistory()
+
   const insight = result?.insights || {
     message: "Análise indisponível.",
   }
@@ -27,6 +29,16 @@ export default function App() {
     }),
     score: entry.score,
   }))
+
+  const trendLabels = {
+    ASCENDENTE: "Ascendente",
+    ESTAVEL: "Estável",
+    DESCENDENTE: "Descendente",
+    CRITICA: "Crítica",
+  }
+
+  const formattedDelta =
+    insight?.delta === 0 ? "" : `${insight?.delta > 0 ? "+" : ""}${insight?.delta} pts`
 
   const handleSubmit = async (data) => {
     setLoading(true)
@@ -66,14 +78,17 @@ export default function App() {
   if (step === "result") {
     return (
       <div className="w-full">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
-          <h3 className="text-ig font-semibold text-slate-800 mb-2">
-            Análise Evolutiva
-          </h3>
-          <p className="text-slate-600 leading-relaxed">
-            {insight.message}
-          </p>
+        <div className="insight-card">
+          <h3>Análise Evolutiva</h3>
+
+          <p>{insight.message}</p>
+
+          <div className="insight-meta">
+            <span>{trendLabels[insight.trend]}</span>
+            {formattedDelta && <span>• {formattedDelta}</span>}
+          </div>
         </div>
+
         <ResultCard
           result={result}
           requestData={lastPayload}
