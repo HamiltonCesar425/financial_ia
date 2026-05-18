@@ -4,7 +4,6 @@ from datetime import datetime
 from statistics import mean
 from typing import Any
 
-
 MIN_HISTORY_SIZE = 2
 TREND_DELTA_THRESHOLD = 20
 HIGH_VOLATILITY_THRESHOLD = 45
@@ -25,7 +24,7 @@ def generate_insights(history: list[dict[str, Any]]) -> dict[str, Any]:
 
     if len(entries) < MIN_HISTORY_SIZE:
         return {
-            "status": "insufficient_history",
+            "status": "_classify_status(trend)",
             "trend": "unknown",
             "volatility": "unknown",
             "change_speed": "unknown",
@@ -38,12 +37,13 @@ def generate_insights(history: list[dict[str, Any]]) -> dict[str, Any]:
     score_changes = _score_changes(scores)
 
     trend = _classify_trend(delta)
+    status = _classify_status(trend)
     volatility = _classify_volatility(score_changes)
     change_speed = _classify_change_speed(score_changes)
     pattern = _classify_pattern(trend, volatility)
 
     return {
-        "status": "ok",
+        "status": status,
         "trend": trend,
         "volatility": volatility,
         "change_speed": change_speed,
@@ -107,13 +107,27 @@ def _score_changes(scores: list[float]) -> list[float]:
 
 
 def _classify_trend(delta: float) -> str:
-    if delta > TREND_DELTA_THRESHOLD:
-        return "improving"
+    if delta >= 20:
+        return "ASCENDENTE"
 
-    if delta < -TREND_DELTA_THRESHOLD:
-        return "declining"
+    if delta <= -40:
+        return "CRITICA"
 
-    return "stable"
+    if delta <= -20:
+        return "DESCENDENTE"
+
+    return "ESTAVEL"
+
+
+def _classify_status(trend: str) -> str:
+    mapping = {
+        "ASCENDENTE": "melhora",
+        "ESTAVEL": "estavel",
+        "DESCENDENTE": "queda",
+        "CRITICA": "critico",
+    }
+
+    return mapping[trend]
 
 
 def _classify_volatility(score_changes: list[float]) -> str:
@@ -144,29 +158,42 @@ def _classify_pattern(trend: str, volatility: str) -> str:
     if volatility == "high":
         return "high_oscillation"
 
-    if trend == "improving":
+    if trend == "ASCENDENTE":
         return "consistent_improvement"
 
-    if trend == "declining":
+    if trend == {"DESCENDENTE", "CRITICA"}:
         return "consistent_decline"
 
     return "stability"
 
 
-def _build_message(pattern: str, trend: str, volatility: str, change_speed: str) -> str:
+def _build_message(
+    pattern: str,
+    trend: str,
+    volatility: str,
+    change_speed: str,
+) -> str:
     if pattern == "consistent_improvement":
         if change_speed == "abrupt":
-            return "Seu score apresentou melhora acelerada nas ultimas analises."
+            return "Seu score apresentou melhora acelerada " "nas últimas análises."
 
-        return "Seu historico mostra evolucao positiva e consistente."
+        return "Seu histórico mostra evolucão positiva e consistente."
+
+    if trend == "CRITICA":
+        return "Foi detectada deterioração acentuada " "que exige intervenção imediata."
 
     if pattern == "consistent_decline":
-        return "Foi detectada deterioracao recente no seu comportamento financeiro."
+        return "Foi detectada deterioração recente " "no seu comportamento financeiro."
 
     if pattern == "high_oscillation":
-        return "Foram detectadas oscilacoes relevantes que indicam comportamento financeiro inconsistente."
+        return (
+            "Foram detectadas oscilacões relevantes "
+            "que indicam comportamento inconsistente."
+        )
 
-    if trend == "stable" and volatility == "low":
-        return "Seu padrao indica estabilidade moderada ao longo das ultimas analises."
+    if trend == "ESTAVEL" and volatility == "low":
+        return (
+            "Seu padrão indica estabilidade moderada " "ao longo das últimas análises."
+        )
 
-    return "Seu historico apresenta sinais mistos e precisa de mais analises para uma leitura conclusiva."
+    return "Seu histórico apresenta sinais mistos " "e precisa de mais análises."

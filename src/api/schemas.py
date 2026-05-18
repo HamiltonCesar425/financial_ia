@@ -121,13 +121,29 @@ class DiagnosisRequest(BaseModel):
 # OUTPUT - Diagnóstico
 # ==============================
 class InsightResponse(BaseModel):
-    status: str
-    trend: str
+    status: Literal[
+        "melhora",
+        "estavel",
+        "queda",
+        "critico"
+    ]
+
+    trend: Literal[
+        "ASCENDENTE",
+        "ESTAVEL",
+        "DESCENDENTE",
+        "CRITICA"
+    ]
+
     volatility: str
     change_speed: str
+
     message: str
+
     pattern: str | None = None
+
     delta: float | int = 0
+
     first_score: float | None = None
     last_score: float | None = None
     analyses_count: int | None = None
