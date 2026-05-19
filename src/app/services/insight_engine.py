@@ -24,8 +24,8 @@ def generate_insights(history: list[dict[str, Any]]) -> dict[str, Any]:
 
     if len(entries) < MIN_HISTORY_SIZE:
         return {
-            "status": "_classify_status(trend)",
-            "trend": "unknown",
+            "status": "estavel",
+            "trend": "ESTAVEL",
             "volatility": "unknown",
             "change_speed": "unknown",
             "delta": 0,

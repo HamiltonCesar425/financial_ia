@@ -3,6 +3,8 @@ from typing import List, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from src.app.schemas.prediction import PredictionResponse
+
 
 # ==============================
 # INPUT - Série temporal
@@ -174,6 +176,8 @@ class DiagnosisResponse(BaseModel):
         min_length=3,
         max_length=3,
     )
+
+    prediction: PredictionResponse | None = None
 
     insights: InsightResponse | None = None
 

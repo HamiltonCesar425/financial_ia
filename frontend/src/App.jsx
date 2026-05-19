@@ -76,6 +76,14 @@ export default function App() {
   }
 
   if (step === "result") {
+    const prediction = result?.prediction
+    const predictionFactors = prediction?.explanatory_factors?.filter(Boolean) || []
+    const predictionTrendLabels = {
+      positive: "Positiva",
+      stable: "Estável",
+      negative: "Negativa",
+    }
+
     return (
       <div className="w-full">
         <div className="insight-card">
@@ -88,7 +96,53 @@ export default function App() {
             {formattedDelta && <span>• {formattedDelta}</span>}
           </div>
         </div>
+        {prediction && (
+          <div className="insight-card prediction-card">
+            <h3>Projeção Financeira (30 dias)</h3>
 
+            <div className="prediction-summary">
+              <div>
+                <span>Score projetado</span>
+                <strong>{prediction.projected_score_30d}</strong>
+              </div>
+
+              <div>
+                <span>Tendência</span>
+                <strong>{predictionTrendLabels[prediction.trend] || "Estável"}</strong>
+              </div>
+
+              <div>
+                <span>Confiança</span>
+                <strong>{Math.round(prediction.confidence * 100)}%</strong>
+              </div>
+
+              <div>
+                <span>Variação</span>
+                <strong>
+                  {prediction.delta > 0 ? "+" : ""}
+                  {prediction.delta.toFixed(1)}
+                </strong>
+              </div>
+            </div>
+
+            <p>
+              Projeção baseada na estabilidade atual do fluxo financeiro.
+            </p>
+
+            {predictionFactors.length > 0 ? (
+              <ul className="prediction-factors">
+                {predictionFactors.map((factor, index) => (
+                  <li key={`${factor}-${index}`}>{factor}</li>
+                ))}
+              </ul>
+            ) : (
+              <p className="prediction-empty">
+                Nenhum fator crítico adicional foi identificado nesta projeção.
+              </p>
+            )}
+          </div>
+        )}
+        
         <ResultCard
           result={result}
           requestData={lastPayload}

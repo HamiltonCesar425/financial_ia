@@ -38,6 +38,38 @@ def test_diagnosis_json_endpoint_returns_structured_payload():
             "Realizar revisão financeira mensal",
             "Realizar revisão financeira mensal",
         ],
+        "prediction": {
+            "current_score": 78,
+            "projected_score_30d": 100,
+            "delta": 34,
+            "trend": "positive",
+            "confidence": 0.97,
+            "projection_horizon_days": 30,
+            "explanatory_factors": [],
+        },
+    }
+
+
+def test_diagnosis_json_endpoint_accepts_empty_history():
+    response = client.post(
+        "/diagnosis",
+        json={
+            "receita": 1000,
+            "despesas": 400,
+            "divida": 150,
+            "reserva": 500,
+            "history": [],
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.json()["insights"] == {
+        "status": "estavel",
+        "trend": "ESTAVEL",
+        "volatility": "unknown",
+        "change_speed": "unknown",
+        "message": "Ainda nao ha historico suficiente para interpretar sua evolucao financeira.",
+        "delta": 0,
     }
 
 

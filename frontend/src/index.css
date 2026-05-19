@@ -288,3 +288,57 @@ body {
   font-weight: 600;
   color: #334155;
 }
+
+.prediction-card {
+  display: grid;
+  gap: 1rem;
+}
+
+.prediction-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.prediction-summary div {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem;
+  background: #f8fafc;
+}
+
+.prediction-summary span {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #64748b;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.prediction-summary strong {
+  color: #0f172a;
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.prediction-factors {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: #334155;
+}
+
+.prediction-factors li {
+  margin-top: 0.35rem;
+}
+
+.prediction-empty {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 760px) {
+  .prediction-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

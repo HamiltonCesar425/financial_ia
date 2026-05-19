@@ -1,4 +1,6 @@
 from typing import Dict, Mapping
+from src.app.services.prediction_engine import PredictionEngine
+
 
 
 def _classify(score: int) -> str:
@@ -84,6 +86,18 @@ def generate_diagnosis(data: Mapping[str, float]) -> Dict[str, object]:
 
     classification = _classify(score)
 
+    prediction_engine = PredictionEngine()
+
+    prediction = prediction_engine.predict_score_30d(
+        current_score=score,
+        metrics={
+            "liquidity_ratio": min(reserva / receita, 1.0),
+            "debt_ratio": min(divida / receita, 1.0),
+            "stability_score": max(0.0, 1 - ratio),
+            "cashflow_trend": max(0.0, min((receita - despesas) / receita, 1.0)),
+        }
+    )
+
     diagnosis_map = {
         "Crítico": (
             "Sua saúde financeira apresenta vulnerabilidade severa "
@@ -119,4 +133,5 @@ def generate_diagnosis(data: Mapping[str, float]) -> Dict[str, object]:
             divida,
             reserva,
         ),
+        "prediction": prediction.model_dump(),
     }
