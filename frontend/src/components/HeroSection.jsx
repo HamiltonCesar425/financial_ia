@@ -1,16 +1,28 @@
-export default function HeroSection() {
+export default function HeroSection({ onStart }) {
   return (
     <section className="hero card">
-      <span className="product-tag">Produto MVP</span>
-      <h1>Diagnostico Financeiro Automatizado</h1>
-      <h2>Entenda sua saude financeira em menos de 1 minuto</h2>
+      <span className="product-tag">Versão Fundadora</span>
+
+      <h1>Diagnóstico Financeiro Automatizado com Score, Alertas e Projeções Explicáveis.
+      </h1>
+
+      <h2>Entenda sua saúde financeira através de indicadores estruturais e análises automatizadas.
+      </h2>
+
       <p>
-        Informe receita, despesas e divida para receber um score financeiro com
-        classificacao e recomendacao pratica.
+        O Financial IA analisa informações financeiras informadas manualmente para
+        gerar score, classificação de risco, alertas financeiros,
+        recomendações iniciais e projeções de evolução.
       </p>
-      <a className="primary-link" href="#formulario-score">
-        Fazer minha analise
-      </a>
+
+      <button className="primary-link" type="button" onClick={onStart}>
+        Testar Diagnóstico
+      </button>
+
+      <small className="hero-disclaimer">
+        Plataforma em evolução contínua • Uso informativo e educacional.
+      </small>
     </section>
   );
 }
+

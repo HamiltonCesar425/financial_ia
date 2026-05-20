@@ -6,7 +6,8 @@ import { generateDiagnosis } from "./services/api"
 import HistoryPanel from "./components/HistoryPanel"
 import ScoreHistoryChart from "./features/essential-diagnosis/components/ScoreHistoryChart"
 import DataCollection from "./features/essential-diagnosis/pages/DataCollection"
-import Landing from "./features/essential-diagnosis/pages/Landing"
+import Home from "./features/essential-diagnosis/pages/Home"
+import Privacy from "./features/essential-diagnosis/pages/Privacy"
 import { getHistory, saveAnalysis } from "./utils/historyStorage"
 
 export default function App() {
@@ -40,6 +41,10 @@ export default function App() {
   const formattedDelta =
     insight?.delta === 0 ? "" : `${insight?.delta > 0 ? "+" : ""}${insight?.delta} pts`
 
+  if (window.location.pathname === "/privacy") {
+    return <Privacy />
+  }
+
   const handleSubmit = async (data) => {
     setLoading(true)
     setError(null)
@@ -68,7 +73,7 @@ export default function App() {
   }
 
   if (step === "landing") {
-    return <Landing onStart={() => setStep("collection")} />
+    return <Home onStart={() => setStep("collection")} />
   }
 
   if (step === "collection") {
