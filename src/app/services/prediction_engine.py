@@ -3,6 +3,34 @@ from typing import Dict
 from src.app.schemas.prediction import PredictionResponse
 
 
+CONFIDENCE_FORMULA = (
+    "Confiança = 1 - variância dos sinais normalizados "
+    "(liquidez, dívida, estabilidade e fluxo de caixa)."
+)
+
+
+def build_projection_explanation(historical_delta: float, projected_delta: float) -> str:
+    if historical_delta < 0 and projected_delta > 0:
+        return (
+            "Apesar da queda recente no histórico, a projeção considera os indicadores "
+            "atuais de estabilidade e fluxo de caixa, que sinalizam recuperação nos próximos 30 dias."
+        )
+
+    if historical_delta > 0 and projected_delta < 0:
+        return (
+            "Mesmo com melhora recente no histórico, os indicadores atuais sugerem pressão "
+            "sobre o score nos próximos 30 dias."
+        )
+
+    if abs(projected_delta) <= 5:
+        return (
+            "A projeção indica estabilidade porque os sinais atuais não apontam "
+            "pressão relevante de melhora ou deterioração."
+        )
+
+    return "Projeção baseada na estabilidade atual do fluxo financeiro."
+
+
 class PredictionEngine:
     """
     Engine responsible for forecasting future financial scores
@@ -71,7 +99,10 @@ class PredictionEngine:
             delta=delta,
             trend=trend,
             confidence=confidence,
+            confidence_formula=CONFIDENCE_FORMULA,
+            confidence_factors=signals,
             projection_horizon_days=30,
+            prediction_context=build_projection_explanation(0, delta),
             explanatory_factors=factors,
         )
 

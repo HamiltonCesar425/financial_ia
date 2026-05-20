@@ -8,6 +8,7 @@ from fastapi import APIRouter, File, HTTPException, UploadFile
 
 from src.api.schemas import DiagnosisRequest, DiagnosisResponse
 from src.app.services.insight_engine import generate_insights
+from src.app.services.prediction_engine import build_projection_explanation
 from src.domain.diagnosis_service import generate_diagnosis
 from src.observability.registry import diagnosis_generated, diagnosis_latency
 
@@ -63,6 +64,10 @@ def diagnosis_endpoint(payload: DiagnosisRequest) -> DiagnosisResponse:
                 }
             )
             result["insights"] = generate_insights(history)
+            result["prediction"]["prediction_context"] = build_projection_explanation(
+                result["insights"].get("delta", 0),
+                result["prediction"]["delta"],
+            )
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
     except Exception as exc:

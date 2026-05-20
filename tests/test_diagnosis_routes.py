@@ -44,7 +44,18 @@ def test_diagnosis_json_endpoint_returns_structured_payload():
             "delta": 34,
             "trend": "positive",
             "confidence": 0.97,
+            "confidence_formula": (
+                "Confiança = 1 - variância dos sinais normalizados "
+                "(liquidez, dívida, estabilidade e fluxo de caixa)."
+            ),
+            "confidence_factors": {
+                "liquidity": 0.5,
+                "debt": 0.15,
+                "stability": 0.6,
+                "cashflow": 0.6,
+            },
             "projection_horizon_days": 30,
+            "prediction_context": "Projeção baseada na estabilidade atual do fluxo financeiro.",
             "explanatory_factors": [],
         },
     }

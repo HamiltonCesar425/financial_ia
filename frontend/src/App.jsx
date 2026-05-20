@@ -93,7 +93,7 @@ export default function App() {
 
           <div className="insight-meta">
             <span>{trendLabels[insight.trend]}</span>
-            {formattedDelta && <span>• {formattedDelta}</span>}
+            {formattedDelta && <span>• Variação histórica: {formattedDelta}</span>}
           </div>
         </div>
         {prediction && (
@@ -117,7 +117,7 @@ export default function App() {
               </div>
 
               <div>
-                <span>Variação</span>
+                <span>Variação projetada</span>
                 <strong>
                   {prediction.delta > 0 ? "+" : ""}
                   {prediction.delta.toFixed(1)}
@@ -126,7 +126,7 @@ export default function App() {
             </div>
 
             <p>
-              Projeção baseada na estabilidade atual do fluxo financeiro.
+              {prediction.prediction_context}
             </p>
 
             {predictionFactors.length > 0 ? (
