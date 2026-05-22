@@ -13,3 +13,8 @@ export const generateDiagnosis = async (payload) => {
   const response = await instance.post("/diagnosis", payload);
   return response.data;
 };
+
+export const sendFeedback = async (payload) => {
+  const response = await instance.post("/feedback", payload);
+  return response.data;
+};

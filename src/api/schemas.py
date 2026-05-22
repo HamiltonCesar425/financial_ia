@@ -204,3 +204,39 @@ class DiagnosisResponse(BaseModel):
             }
         },
     )
+
+
+# ==============================
+# INPUT - Feedback
+# ==============================
+class FeedbackRequest(BaseModel):
+    name: str | None = Field(default=None, max_length=120)
+    email: str | None = Field(default=None, max_length=254)
+    message: str = Field(..., min_length=3, max_length=2000)
+
+    model_config = ConfigDict(extra="forbid")
+
+    @field_validator("name", "email", "message", mode="before")
+    @classmethod
+    def strip_text_fields(cls, value):
+        if isinstance(value, str):
+            return value.strip()
+        return value
+
+    @field_validator("name", "email", mode="before")
+    @classmethod
+    def empty_string_to_none(cls, value):
+        if isinstance(value, str) and value.strip() == "":
+            return None
+        return value
+
+    @field_validator("email")
+    @classmethod
+    def validate_optional_email(cls, value):
+        if value is None:
+            return value
+
+        if "@" not in value or "." not in value.rsplit("@", 1)[-1]:
+            raise ValueError("Email inválido")
+
+        return value

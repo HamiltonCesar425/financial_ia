@@ -1,5 +1,8 @@
 # app.py
+import json
 import time
+from datetime import datetime, timezone
+from pathlib import Path
 from fastapi import FastAPI, APIRouter, HTTPException
 from src.api.routes.diagnosis import router as diagnosis_router
 from prometheus_fastapi_instrumentator import Instrumentator
@@ -8,7 +11,7 @@ from starlette.middleware.cors import CORSMiddleware
 
 import src.core.health_score as health_score
 
-from src.api.schemas import ScoreResponse, ScoreRequest
+from src.api.schemas import FeedbackRequest, ScoreResponse, ScoreRequest
 from src.api.business_metrics import (
     PREDICTION_LATENCY,
     PREDICTION_REQUESTS,
@@ -66,6 +69,26 @@ def root():
 @app.get("/health", summary="Health check")
 def health():
     return {"status": "ok"}
+
+
+@router.post("/feedback", summary="Recebe feedback do produto")
+def receive_feedback(payload: FeedbackRequest):
+    feedback_dir = Path("data")
+    feedback_dir.mkdir(parents=True, exist_ok=True)
+
+    record = {
+        "received_at": datetime.now(timezone.utc).isoformat(),
+        "name": payload.name,
+        "email": payload.email,
+        "message": payload.message,
+    }
+
+    with (feedback_dir / "feedback.jsonl").open("a", encoding="utf-8") as file:
+        file.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+    logger.info("Feedback recebido")
+
+    return {"status": "received", "message": "Feedback enviado com sucesso."}
 
 
 # ======================================

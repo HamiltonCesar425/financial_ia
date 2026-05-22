@@ -6,6 +6,7 @@ import { generateDiagnosis } from "./services/api"
 import HistoryPanel from "./components/HistoryPanel"
 import ScoreHistoryChart from "./features/essential-diagnosis/components/ScoreHistoryChart"
 import DataCollection from "./features/essential-diagnosis/pages/DataCollection"
+import Feedback from "./features/essential-diagnosis/pages/Feedback"
 import Home from "./features/essential-diagnosis/pages/Home"
 import Privacy from "./features/essential-diagnosis/pages/Privacy"
 import { getHistory, saveAnalysis } from "./utils/historyStorage"
@@ -43,6 +44,10 @@ export default function App() {
 
   if (window.location.pathname === "/privacy") {
     return <Privacy />
+  }
+
+  if (window.location.pathname === "/feedback") {
+    return <Feedback />
   }
 
   const handleSubmit = async (data) => {
@@ -130,9 +135,7 @@ export default function App() {
               </div>
             </div>
 
-            <p>
-              {prediction.prediction_context}
-            </p>
+            <p>{prediction.prediction_context}</p>
 
             {predictionFactors.length > 0 ? (
               <ul className="prediction-factors">
@@ -147,7 +150,7 @@ export default function App() {
             )}
           </div>
         )}
-        
+
         <ResultCard
           result={result}
           requestData={lastPayload}
