@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, EmailStr
 
 from src.app.schemas.prediction import PredictionResponse
 
@@ -239,4 +239,22 @@ class FeedbackRequest(BaseModel):
         if "@" not in value or "." not in value.rsplit("@", 1)[-1]:
             raise ValueError("Email inválido")
 
+        return value
+
+#=========================================
+# INPUT - Contact
+#=========================================
+
+class ContactRequest(BaseModel):
+    name: str = Field(..., min_length=2, max_length=120)
+    email: EmailStr
+    message: str = Field(..., min_length=3, max_length=2000)
+
+    model_config = ConfigDict(extra="forbid")
+
+    @field_validator("name", "message", mode= "before")
+    @classmethod
+    def strip_text_fields(cls, value):
+        if isinstance(value, str):
+            return value.strip()
         return value

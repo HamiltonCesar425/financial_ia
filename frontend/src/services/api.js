@@ -18,3 +18,8 @@ export const sendFeedback = async (payload) => {
   const response = await instance.post("/feedback", payload);
   return response.data;
 };
+
+export const sendContact = async (payload) => {
+  const response = await instance.post("/contact", payload);
+  return response.data;
+};

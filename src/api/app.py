@@ -11,7 +11,12 @@ from starlette.middleware.cors import CORSMiddleware
 
 import src.core.health_score as health_score
 
-from src.api.schemas import FeedbackRequest, ScoreResponse, ScoreRequest
+from src.api.schemas import (
+    FeedbackRequest,
+    ScoreResponse,
+    ScoreRequest,
+    ContactRequest,
+)
 from src.api.business_metrics import (
     PREDICTION_LATENCY,
     PREDICTION_REQUESTS,
@@ -74,7 +79,7 @@ def health():
 @router.post("/feedback", summary="Recebe feedback do produto")
 def receive_feedback(payload: FeedbackRequest):
     feedback_dir = Path("data")
-    feedback_dir.mkdir(parents=True, exist_ok=True)
+    feedback_dir.mkdir(parents=True, exist_ok=True) 
 
     record = {
         "received_at": datetime.now(timezone.utc).isoformat(),
@@ -89,6 +94,28 @@ def receive_feedback(payload: FeedbackRequest):
     logger.info("Feedback recebido")
 
     return {"status": "received", "message": "Feedback enviado com sucesso."}
+
+
+@router.post("/contact", summary="Contato")
+def contact(payload: ContactRequest):
+    contact_dir = Path("data")
+    contact_dir.mkdir(parents=True, exist_ok=True) 
+
+    record = {
+        "received_at": datetime.now(timezone.utc).isoformt(),
+        "name": payload.name,
+        "email": payload.email,
+        "message": payload.message,
+    }
+
+    with (contact_dir / "contact.jsonl").open("a", encoding="utf-8") as file:
+        file.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+    logger.info("Contato recebido")
+
+    return {"status": "received", "message": "Contato enviado com sucesso."}
+
+
 
 
 # ======================================

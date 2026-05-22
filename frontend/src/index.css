@@ -158,12 +158,19 @@ body {
   cursor: pointer;
   font: inherit;
   font-weight: 700;
-  padding: 1.05rem 1.45rem;
+  padding: 1.05rem 1.55rem;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
   text-decoration: none;
+  transition:
+    background 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
 }
 
 .primary-link:hover {
   background: #1f2937;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.18);
+  transform: translateY(-1px);
 }
 
 .hero-disclaimer {
@@ -358,7 +365,7 @@ body {
 
 .feedback-page {
   min-height: 100vh;
-  width: min(100% - 3rem, 860px);
+  width: min(100% - 3rem, 768px);
   margin: 0 auto;
   padding: 5rem 0;
   color: #111827;
@@ -415,17 +422,20 @@ body {
   font: inherit;
   padding: 0.95rem 1rem;
   outline: none;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
 }
 
 .feedback-form textarea {
   line-height: 1.6;
-  resize: vertical;
+  resize: none;
 }
 
 .feedback-form input:focus,
 .feedback-form textarea:focus {
   border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16);
 }
 
 .feedback-form .primary-link:disabled {

@@ -9,6 +9,7 @@ import DataCollection from "./features/essential-diagnosis/pages/DataCollection"
 import Feedback from "./features/essential-diagnosis/pages/Feedback"
 import Home from "./features/essential-diagnosis/pages/Home"
 import Privacy from "./features/essential-diagnosis/pages/Privacy"
+import Contact from "./features/essential-diagnosis/pages/Contact"
 import { getHistory, saveAnalysis } from "./utils/historyStorage"
 
 export default function App() {
@@ -48,6 +49,10 @@ export default function App() {
 
   if (window.location.pathname === "/feedback") {
     return <Feedback />
+  }
+
+  if (window.location.pathname === "/contact") {
+    return <Contact />
   }
 
   const handleSubmit = async (data) => {
