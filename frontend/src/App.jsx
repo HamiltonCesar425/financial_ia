@@ -173,5 +173,5 @@ export default function App() {
     )
   }
 
-  return null
+  return <p> Fluxo inválido.</p>
 }

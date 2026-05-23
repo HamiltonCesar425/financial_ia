@@ -3,10 +3,10 @@ export default function HeroSection({ onStart }) {
     <section className="hero card">
       <span className="product-tag">Versão Fundadora</span>
 
-      <h1>Diagnóstico Financeiro Automatizado com Score, Alertas e Projeções Explicáveis.
+      <h1>Entenda sua saúde financeira com análises automatizadas e score inteligente.
       </h1>
 
-      <h2>Entenda sua saúde financeira através de indicadores estruturais e análises automatizadas.
+      <h2>Receba score finaneiro, alertas de risco e recomendações iniciais em segundos.
       </h2>
 
       <p>

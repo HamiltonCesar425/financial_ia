@@ -16,7 +16,7 @@ export default function FeaturesSection() {
 
         <article className="feature-card">
           <h3>Projeções explicáveis</h3>
-          <p>Entenda a tendência dos próximos dias com fatores claros.</p>
+          <p>Acompanhe tendências financeiras com interpretações transparentes.</p>
         </article>
       </div>
     </section>

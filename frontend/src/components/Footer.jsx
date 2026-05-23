@@ -9,10 +9,10 @@ export default function Footer() {
           <p>Diagnóstico financeiro automatizado para decisões mais conscientes.</p>
         </div>
 
-        <nav>
-          <a href="/privacy">Privacidade</a>
-          <a href="/feedback">Feedback</a>
-          <a href="/contact">Contato</a>
+        <nav aria-label="Navegação do rodapé">
+          <Link to="/privacy">Privacidade</Link>
+          <Link to="/feedback">Feedback</Link>
+          <Link to="/contact">Contato</Link>
         </nav>
       </div>
 
@@ -21,8 +21,6 @@ export default function Footer() {
         <small>Plataforma em evolução contínua.</small>
       </div>
 
-      <Link to="/privacy">Privacidade</Link>
-
-    </footer>
+      </footer>
   )
 }
