@@ -4,8 +4,8 @@ export default function AudienceSection() {
       <h2>Para quem o Financial IA foi desenvolvido</h2>
 
       <p>
-        Para pessoas que querem organizar a vida financeira com clareza,
-        sem depender de planilhas complexas ou interpretações soltas.
+        Para pessoas que querem organizar a vida financeira com clareza, sem
+        depender de planilhas complexas ou interpretações soltas.
       </p>
 
       <ul>

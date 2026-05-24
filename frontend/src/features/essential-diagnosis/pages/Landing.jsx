@@ -2,15 +2,10 @@ export default function Landing({ onStart }) {
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-6">
       <div className="max-w-4xl text-center space-y-12">
-
         <div className="space-y-1">
-          <h1 className="text-3xl font-bold text-slate-900">
-            financial_ia
-          </h1>
+          <h1 className="text-3xl font-bold text-slate-900">financial_ia</h1>
 
-          <p className="text-base text-slate-500">
-            Diagnóstico Essencial
-          </p>
+          <p className="text-base text-slate-500">Diagnóstico Essencial</p>
         </div>
 
         <div className="space-y-5">
@@ -19,8 +14,8 @@ export default function Landing({ onStart }) {
           </h2>
 
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Receba um diagnóstico automatizado com score financeiro,
-            alertas prioritários e recomendações iniciais.
+            Receba um diagnóstico automatizado com score financeiro, alertas
+            prioritários e recomendações iniciais.
           </p>
         </div>
 
@@ -48,8 +43,7 @@ export default function Landing({ onStart }) {
         <p className="text-sm text-slate-500">
           Sem complexidade. Resultado em instantes.
         </p>
-
       </div>
     </div>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router-dom"
 
 export default function Footer() {
   return (
@@ -6,7 +6,9 @@ export default function Footer() {
       <div className="footer-main">
         <div>
           <h3>Financial IA</h3>
-          <p>Diagnóstico financeiro automatizado para decisões mais conscientes.</p>
+          <p>
+            Diagnóstico financeiro automatizado para decisões mais conscientes.
+          </p>
         </div>
 
         <nav aria-label="Navegação do rodapé">
@@ -20,7 +22,6 @@ export default function Footer() {
         <small>Financial IA • Uso informativo e educacional.</small>
         <small>Plataforma em evolução contínua.</small>
       </div>
-
-      </footer>
+    </footer>
   )
 }

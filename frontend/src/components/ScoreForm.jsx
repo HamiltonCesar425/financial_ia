@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from "react"
 
 export default function ScoreForm({ onSubmit, loading }) {
   const [formData, setFormData] = useState({
@@ -6,9 +6,9 @@ export default function ScoreForm({ onSubmit, loading }) {
     despesas: "",
     divida: "",
     reserva: "",
-  });
+  })
 
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState({})
 
   const fields = [
     {
@@ -35,58 +35,58 @@ export default function ScoreForm({ onSubmit, loading }) {
       placeholder: "2000",
       helper: "Valor disponível para emergências ou liquidez imediata.",
     },
-  ];
+  ]
 
   const validate = () => {
-    const nextErrors = {};
+    const nextErrors = {}
 
-    const receita = Number(formData.receita);
-    const despesas = Number(formData.despesas);
-    const divida = Number(formData.divida);
-    const reserva = Number(formData.reserva);
+    const receita = Number(formData.receita)
+    const despesas = Number(formData.despesas)
+    const divida = Number(formData.divida)
+    const reserva = Number(formData.reserva)
 
     if (formData.receita === "" || Number.isNaN(receita) || receita <= 0) {
-      nextErrors.receita = "Informe uma receita válida.";
+      nextErrors.receita = "Informe uma receita válida."
     }
 
     if (formData.despesas === "" || Number.isNaN(despesas) || despesas < 0) {
-      nextErrors.despesas = "Informe despesas válidas.";
+      nextErrors.despesas = "Informe despesas válidas."
     }
 
     if (formData.divida === "" || Number.isNaN(divida) || divida < 0) {
-      nextErrors.divida = "Informe uma dívida válida.";
+      nextErrors.divida = "Informe uma dívida válida."
     }
 
     if (formData.reserva === "" || Number.isNaN(reserva) || reserva < 0) {
-      nextErrors.reserva = "Informe uma reserva válida.";
+      nextErrors.reserva = "Informe uma reserva válida."
     }
 
     if (despesas > receita) {
       nextErrors.despesas =
-        "As despesas não podem ultrapassar sua receita mensal.";
+        "As despesas não podem ultrapassar sua receita mensal."
     }
 
-    setErrors(nextErrors);
-    return Object.keys(nextErrors).length === 0;
-  };
+    setErrors(nextErrors)
+    return Object.keys(nextErrors).length === 0
+  }
 
   const handleChange = (field, value) => {
     setFormData((current) => ({
       ...current,
       [field]: value,
-    }));
+    }))
 
     setErrors((current) => ({
       ...current,
       [field]: undefined,
-    }));
-  };
+    }))
+  }
 
   const handleSubmit = (event) => {
-    event.preventDefault();
+    event.preventDefault()
 
     if (!validate()) {
-      return;
+      return
     }
 
     onSubmit({
@@ -94,8 +94,8 @@ export default function ScoreForm({ onSubmit, loading }) {
       despesas: Number(formData.despesas),
       divida: Number(formData.divida),
       reserva: Number(formData.reserva),
-    });
-  };
+    })
+  }
 
   return (
     <form id="formulario-score" className="score-form" onSubmit={handleSubmit}>
@@ -124,5 +124,5 @@ export default function ScoreForm({ onSubmit, loading }) {
         {loading ? "Analisando..." : "Calcular meu diagnóstico"}
       </button>
     </form>
-  );
+  )
 }

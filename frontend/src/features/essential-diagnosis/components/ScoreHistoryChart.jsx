@@ -15,7 +15,9 @@ function ScoreHistoryChart({ data }) {
 
   return (
     <section className="bg-white rounded-2x1 shadow-md p-6 mt-8">
-      <h2 className="text-x1 font-semibold md-4">Evolução do Score Financeiro</h2>
+      <h2 className="text-x1 font-semibold md-4">
+        Evolução do Score Financeiro
+      </h2>
 
       <ResponsiveContainer width="100%" height={320}>
         <LineChart data={data}>
@@ -29,7 +31,7 @@ function ScoreHistoryChart({ data }) {
         </LineChart>
       </ResponsiveContainer>
     </section>
-  );
+  )
 }
 
 export default ScoreHistoryChart

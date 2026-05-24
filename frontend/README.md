@@ -6,8 +6,8 @@ Interface do MVP do produto **Diagnóstico Financeiro Automatizado**, responsáv
 
 ## 📌 Pré-requisitos
 
-* Node.js >= 18
-* Backend FastAPI rodando em `http://localhost:8000`
+- Node.js >= 18
+- Backend FastAPI rodando em `http://localhost:8000`
 
 ---
 
@@ -97,19 +97,19 @@ VITE_API_URL=http://localhost:8000
 
 O frontend trata:
 
-* `422` → Dados inválidos
-* `500` → Erro interno do servidor
-* Falha de rede → API indisponível
+- `422` → Dados inválidos
+- `500` → Erro interno do servidor
+- Falha de rede → API indisponível
 
 ---
 
 ## 🧠 Comportamento da aplicação
 
-* Validação local antes da requisição
-* Botão desabilitado durante envio
-* Estado de loading: *"Analisando seus dados..."*
-* Scroll automático para resultado
-* Possibilidade de refazer análise sem reload
+- Validação local antes da requisição
+- Botão desabilitado durante envio
+- Estado de loading: _"Analisando seus dados..."_
+- Scroll automático para resultado
+- Possibilidade de refazer análise sem reload
 
 ---
 

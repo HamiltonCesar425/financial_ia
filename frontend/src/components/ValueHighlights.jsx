@@ -14,5 +14,5 @@ export default function ValueHighlights() {
         <p>Descubra a proxima acao com base no seu contexto atual.</p>
       </article>
     </section>
-  );
+  )
 }

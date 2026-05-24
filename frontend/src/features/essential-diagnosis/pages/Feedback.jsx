@@ -45,7 +45,8 @@ export default function Feedback() {
 
       setFormData(initialForm)
       setStatus("success")
-    } catch (err) {
+    } catch (error) {
+      console.error(error)
       setStatus("idle")
       setError("Não foi possível enviar agora. Tente novamente em instantes.")
     }
@@ -57,8 +58,9 @@ export default function Feedback() {
         <span className="product-tag">Feedback</span>
         <h1>Ajude a evoluir o Financial IA</h1>
         <p>
-          Este é um produto fundador em evolução contínua. Seu feedback ajuda a priorizar melhorias
-          reais, reduzir atrito e tornar o diagnóstico mais útil.
+          Este é um produto fundador em evolução contínua. Seu feedback ajuda a
+          priorizar melhorias reais, reduzir atrito e tornar o diagnóstico mais
+          útil.
         </p>
       </header>
 
@@ -99,9 +101,15 @@ export default function Feedback() {
         </label>
 
         {error && <p className="feedback-error">{error}</p>}
-        {status === "success" && <p className="feedback-success">Feedback enviado com sucesso.</p>}
+        {status === "success" && (
+          <p className="feedback-success">Feedback enviado com sucesso.</p>
+        )}
 
-        <button className="primary-link" disabled={status === "sending"} type="submit">
+        <button
+          className="primary-link"
+          disabled={status === "sending"}
+          type="submit"
+        >
           {status === "sending" ? "Enviando..." : "Enviar feedback"}
         </button>
       </form>

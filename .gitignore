@@ -28,3 +28,5 @@ bandit-report.json
 
 data/*.jsonl
 
+eslint-report.txt
+

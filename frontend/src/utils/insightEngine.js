@@ -38,7 +38,9 @@ function classifyVolatility(volatility) {
 function calculateVolatility(scores) {
   const mean = scores.reduce((sum, value) => sum + value, 0) / scores.length
 
-  const variance = scores.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / scores.length
+  const variance =
+    scores.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) /
+    scores.length
 
   return Math.sqrt(variance)
 }

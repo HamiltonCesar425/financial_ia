@@ -1,26 +1,26 @@
-import axios from "axios";
+import axios from "axios"
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000",
   timeout: 10000,
-});
+})
 
 export const calculateScore = async (payload) => {
-  const response = await instance.post("/score", payload);
-  return response.data;
-};
+  const response = await instance.post("/score", payload)
+  return response.data
+}
 
 export const generateDiagnosis = async (payload) => {
-  const response = await instance.post("/diagnosis", payload);
-  return response.data;
-};
+  const response = await instance.post("/diagnosis", payload)
+  return response.data
+}
 
 export const sendFeedback = async (payload) => {
-  const response = await instance.post("/feedback", payload);
-  return response.data;
-};
+  const response = await instance.post("/feedback", payload)
+  return response.data
+}
 
 export const sendContact = async (payload) => {
-  const response = await instance.post("/contact", payload);
-  return response.data;
-};
+  const response = await instance.post("/contact", payload)
+  return response.data
+}

@@ -56,7 +56,8 @@ export default function Contact() {
 
       setFormData(initialForm)
       setStatus("success")
-    } catch (err) {
+    } catch (error) {
+      console.error(error)
       setStatus("idle")
       setError("Não foi possível enviar agora. Tente novamente em instantes.")
     }
@@ -70,8 +71,8 @@ export default function Contact() {
         <h1>Entre em contato com o Financial IA</h1>
 
         <p>
-          Para dúvidas, sugestões, parcerias ou assuntos institucionais,
-          utilize o formulário abaixo. As mensagens são analisadas manualmente.
+          Para dúvidas, sugestões, parcerias ou assuntos institucionais, utilize
+          o formulário abaixo. As mensagens são analisadas manualmente.
         </p>
       </header>
 
@@ -117,9 +118,7 @@ export default function Contact() {
         {error && <p className="feedback-error">{error}</p>}
 
         {status === "success" && (
-          <p className="feedback-success">
-            Mensagem enviada com sucesso.
-          </p>
+          <p className="feedback-success">Mensagem enviada com sucesso.</p>
         )}
 
         <button

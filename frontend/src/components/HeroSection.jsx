@@ -3,15 +3,19 @@ export default function HeroSection({ onStart }) {
     <section className="hero card">
       <span className="product-tag">Versão Fundadora</span>
 
-      <h1>Entenda sua saúde financeira com análises automatizadas e score inteligente.
+      <h1>
+        Entenda sua saúde financeira com análises automatizadas e score
+        inteligente.
       </h1>
 
-      <h2>Receba score finaneiro, alertas de risco e recomendações iniciais em segundos.
+      <h2>
+        Receba score financeiro, alertas de risco e recomendações iniciais em
+        segundos.
       </h2>
 
       <p>
-        O Financial IA analisa informações financeiras informadas manualmente para
-        gerar score, classificação de risco, alertas financeiros,
+        O Financial IA analisa informações financeiras informadas manualmente
+        para gerar score, classificação de risco, alertas financeiros,
         recomendações iniciais e projeções de evolução.
       </p>
 
@@ -23,6 +27,5 @@ export default function HeroSection({ onStart }) {
         Plataforma em evolução contínua • Uso informativo e educacional.
       </small>
     </section>
-  );
+  )
 }
-

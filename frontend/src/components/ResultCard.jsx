@@ -1,21 +1,21 @@
 export default function ResultCard({ result, requestData, onReset }) {
-  if (!result) return null;
+  if (!result) return null
 
-  const uniqueAlerts = [...new Set(result.alerts)];
-  const uniqueRecommendations = [...new Set(result.recommendations)];
+  const uniqueAlerts = [...new Set(result.alerts)]
+  const uniqueRecommendations = [...new Set(result.recommendations)]
 
   const formatCurrency = (value) =>
     new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
-    }).format(value);
+    }).format(value)
 
   const getTone = (score) => {
-    if (score < 40) return "danger";
-    if (score < 60) return "warning";
-    if (score < 80) return "attention";
-    return "success";
-  };
+    if (score < 40) return "danger"
+    if (score < 60) return "warning"
+    if (score < 80) return "attention"
+    return "success"
+  }
 
   return (
     <section className="card result-card">
@@ -82,11 +82,7 @@ export default function ResultCard({ result, requestData, onReset }) {
         </div>
       ) : null}
 
-      <button
-        onClick={onReset}
-        className="secondary-button"
-        type="button"
-      >
+      <button onClick={onReset} className="secondary-button" type="button">
         Refazer análise
       </button>
 
@@ -95,5 +91,5 @@ export default function ResultCard({ result, requestData, onReset }) {
         financeira profissional.
       </p>
     </section>
-  );
+  )
 }

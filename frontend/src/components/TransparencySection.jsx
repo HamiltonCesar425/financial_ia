@@ -4,7 +4,8 @@ export default function TransparencySection() {
       <h2>Entenda como os resultados são gerados</h2>
 
       <p>
-        Os resultados são gerados a partir das informações fornecidas por você, combinadas com regras estuturadas de análise financeira.
+        Os resultados são gerados a partir das informações fornecidas por você,
+        combinadas com regras estuturadas de análise financeira.
       </p>
 
       <p>

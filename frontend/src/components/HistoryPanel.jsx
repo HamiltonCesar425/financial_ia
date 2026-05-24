@@ -1,4 +1,6 @@
 import { getHistory } from "../utils/historyStorage"
+import { clearHistory } from "../utils/historyStorage"
+
 
 export default function HistoryPanel() {
   const history = getHistory()
@@ -33,7 +35,8 @@ export default function HistoryPanel() {
             <small>{formatDate(entry.timestamp)}</small>
 
             <p>
-              Receita: {formatCurrency(entry.receita)} | Despesas: {formatCurrency(entry.despesas)}
+              Receita: {formatCurrency(entry.receita)} | Despesas:{" "}
+              {formatCurrency(entry.despesas)}
             </p>
           </div>
         ))}
@@ -42,7 +45,7 @@ export default function HistoryPanel() {
       <button
         className="secondary-button"
         onClick={() => {
-          cleanHistory()
+          clearHistory()
           window.location.reload()
         }}
       >
