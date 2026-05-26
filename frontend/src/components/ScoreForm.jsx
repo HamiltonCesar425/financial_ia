@@ -40,7 +40,7 @@ const parseCurrencyValue = (value) => {
   const normalizedValue = sanitizedValue.includes(",")
     ? sanitizedValue.replace(/\./g, "").replace(",", ".")
     : sanitizedValue.replace(/^(\d{1,3})(\.\d{3})+$/, (value) =>
-        value.replace(/\./g, ""),
+        value.replace(/\./g, "")
       )
 
   return Number(normalizedValue)
@@ -176,8 +176,17 @@ export default function ScoreForm({ onSubmit, loading }) {
       ))}
 
       <button className="primary-button" disabled={loading} type="submit">
-        {loading ? "Analisando..." : "Calcular meu diagnóstico"}
+        {loading
+          ? "Inicializando análise financeira..."
+          : "Calcular meu diagnóstico"}
       </button>
+
+      {loading ? (
+        <p className="loading-note" role="status">
+          Estamos preparando sua análise. Na primeira tentativa, isso pode levar
+          alguns segundos.
+        </p>
+      ) : null}
     </form>
   )
 }

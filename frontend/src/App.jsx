@@ -56,15 +56,15 @@ export default function App() {
         setError("Dados inválidos. Revise os campos informados.")
       } else if (err.response?.status === 500) {
         setError(
-          "Não conseguimos concluir a análise agora. Tente novamente em instantes.",
+          "Não conseguimos concluir a análise agora. Tente novamente em instantes."
         )
       } else if (err.code === "ECONNABORTED") {
         setError(
-          "A análise demorou mais que o esperado. Verifique sua conexão e tente novamente.",
+          "A primeira análise pode levar alguns segundos enquanto o serviço inicializa. Tente novamente em instantes."
         )
       } else {
         setError(
-          "Falha de conexão com o servidor. Verifique sua internet e tente novamente.",
+          "Falha de conexão com o servidor. Verifique sua internet e tente novamente."
         )
       }
     } finally {

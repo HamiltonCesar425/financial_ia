@@ -3,7 +3,8 @@ export function analyzeHistory(history) {
     return {
       trend: "insufficient_data",
       volatility: "unknown",
-      message: "Histórico insuficiente para análise evolutiva.",
+      message:
+        "Ainda não há histórico suficiente para exibir uma análise evolutiva.",
     }
   }
 

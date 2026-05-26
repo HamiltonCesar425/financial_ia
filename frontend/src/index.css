@@ -62,6 +62,14 @@ body {
   font-size: 0.875rem;
 }
 
+.loading-note {
+  margin: -0.6rem 0 0;
+  color: #475569;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
 .error-notice {
   border: 1px solid #fecaca;
   border-radius: 12px;
@@ -106,6 +114,12 @@ body {
   border-radius: 24px;
   padding: 3rem;
   box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+}
+
+.result-page {
+  width: min(100% - 2rem, 1120px);
+  margin: 0 auto;
+  padding: 2rem 0;
 }
 
 .marketing-page {
@@ -655,6 +669,7 @@ body {
   padding: 24px 28px;
   margin-bottom: 24px;
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+  overflow-wrap: anywhere;
 }
 
 .insight-card h3 {
@@ -697,6 +712,7 @@ body {
   border-radius: 12px;
   padding: 1rem;
   background: #f8fafc;
+  min-width: 0;
 }
 
 .prediction-summary span {
@@ -711,6 +727,11 @@ body {
   color: #0f172a;
   font-size: 1.45rem;
   line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.score-history-chart {
+  height: 360px;
 }
 
 .prediction-factors {
@@ -765,6 +786,16 @@ body {
   .card {
     border-radius: 18px;
     padding: 1.6rem;
+  }
+
+  .app-shell {
+    align-items: stretch;
+    padding: 1rem;
+  }
+
+  .result-page {
+    width: min(100% - 1rem, 100%);
+    padding: 1rem 0;
   }
 
   .hero {
@@ -867,8 +898,54 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .insight-card {
+    border-radius: 16px;
+    margin-bottom: 16px;
+    padding: 18px;
+  }
+
+  .insight-meta {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .score-history-chart {
+    height: 300px;
+    margin-top: 1.25rem;
+    padding: 1rem;
+  }
+
   .score-hero strong {
     font-size: 4rem;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .app-shell {
+    align-items: stretch;
+    padding: 1rem;
+  }
+
+  .card {
+    padding: 1.25rem;
+  }
+
+  .score-hero {
+    margin: 1rem 0;
+    padding: 1.25rem;
+  }
+
+  .score-hero strong {
+    font-size: 3.5rem;
+  }
+
+  .prediction-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .score-history-chart {
+    height: 260px;
   }
 }
 

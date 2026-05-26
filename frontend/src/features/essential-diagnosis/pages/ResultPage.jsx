@@ -55,7 +55,10 @@ export default function ResultPage({
         ? new Date(item.timestamp).toLocaleDateString("pt-BR")
         : `Análise ${index + 1}`,
       score:
-        item?.score ?? item?.result?.score ?? item?.result?.financial_score ?? 0,
+        item?.score ??
+        item?.result?.score ??
+        item?.result?.financial_score ??
+        0,
     })) || []
 
   const handleReset = () => {
@@ -66,7 +69,7 @@ export default function ResultPage({
   }
 
   return (
-    <div className="w-full">
+    <main className="result-page">
       <div className="insight-card">
         <h3>Análise Evolutiva</h3>
 
@@ -122,7 +125,9 @@ export default function ResultPage({
           </div>
 
           {prediction.prediction_context ? (
-            <p className="prediction-context">{prediction.prediction_context}</p>
+            <p className="prediction-context">
+              {prediction.prediction_context}
+            </p>
           ) : null}
 
           {predictionFactors.length > 0 ? (
@@ -148,6 +153,6 @@ export default function ResultPage({
       <ScoreHistoryChart data={chartData} />
 
       <HistoryPanel />
-    </div>
+    </main>
   )
 }

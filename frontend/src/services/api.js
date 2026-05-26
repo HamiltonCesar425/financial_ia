@@ -2,7 +2,7 @@ import axios from "axios"
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000",
-  timeout: 10000,
+  timeout: 20000,
 })
 
 export const calculateScore = async (payload) => {
@@ -11,7 +11,9 @@ export const calculateScore = async (payload) => {
 }
 
 export const generateDiagnosis = async (payload) => {
-  const response = await instance.post("/diagnosis", payload)
+  const response = await instance.post("/diagnosis", payload, {
+    timeout: 45000,
+  })
   return response.data
 }
 
