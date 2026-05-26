@@ -8,6 +8,9 @@ const initialForm = {
   message: "",
 }
 
+const isValidEmail = (email) =>
+  email.trim() === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+
 export default function Feedback() {
   const [formData, setFormData] = useState(initialForm)
   const [status, setStatus] = useState("idle")
@@ -28,7 +31,16 @@ export default function Feedback() {
   const handleSubmit = async (event) => {
     event.preventDefault()
 
-    if (formData.message.trim().length < 3) {
+    if (status === "sending") {
+      return
+    }
+
+    if (!isValidEmail(formData.email)) {
+      setError("Informe um email válido ou deixe o campo em branco.")
+      return
+    }
+
+    if (formData.message.trim().length < 10) {
       setError("Escreva uma mensagem um pouco mais completa.")
       return
     }
@@ -38,9 +50,9 @@ export default function Feedback() {
 
     try {
       await sendFeedback({
-        name: formData.name,
-        email: formData.email,
-        message: formData.message,
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        message: formData.message.trim(),
       })
 
       setFormData(initialForm)
@@ -58,17 +70,17 @@ export default function Feedback() {
         <span className="product-tag">Feedback</span>
         <h1>Ajude a evoluir o Financial IA</h1>
         <p>
-          Este é um produto fundador em evolução contínua. Seu feedback ajuda a
-          priorizar melhorias reais, reduzir atrito e tornar o diagnóstico mais
-          útil.
+          Esta plataforma está em evolução contínua, e seu feedback ajuda
+          diretamente na melhoria da experiência e das análises oferecidas.
         </p>
       </header>
 
-      <form className="feedback-form" onSubmit={handleSubmit}>
+      <form className="feedback-form" noValidate onSubmit={handleSubmit}>
         <label>
           <span>Nome</span>
           <input
             autoComplete="name"
+            disabled={status === "sending"}
             name="name"
             placeholder="Opcional"
             type="text"
@@ -80,7 +92,9 @@ export default function Feedback() {
         <label>
           <span>Email</span>
           <input
+            aria-invalid={error.includes("email") ? "true" : "false"}
             autoComplete="email"
+            disabled={status === "sending"}
             name="email"
             placeholder="Opcional"
             type="email"
@@ -92,17 +106,25 @@ export default function Feedback() {
         <label>
           <span>Mensagem</span>
           <textarea
+            aria-invalid={error.includes("mensagem") ? "true" : "false"}
+            disabled={status === "sending"}
             name="message"
-            placeholder="Conte o que funcionou, o que confundiu ou o que você esperava encontrar."
+            placeholder="Conte o que na sua opinião funcionou, o que confundiu você ou o que esperava encontrar."
             rows="7"
             value={formData.message}
             onChange={(event) => handleChange("message", event.target.value)}
           />
         </label>
 
-        {error && <p className="feedback-error">{error}</p>}
+        {error && (
+          <p className="feedback-error" role="alert">
+            {error}
+          </p>
+        )}
         {status === "success" && (
-          <p className="feedback-success">Feedback enviado com sucesso.</p>
+          <p className="feedback-success" role="status">
+            Feedback enviado com sucesso.
+          </p>
         )}
 
         <button

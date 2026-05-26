@@ -1,18 +1,26 @@
 const STORAGE_KEY = "financial_ia_history"
 
 export function getHistory() {
-  const data = localStorage.getItem(STORAGE_KEY)
-  return data ? JSON.parse(data) : []
+  try {
+    const data = localStorage.getItem(STORAGE_KEY)
+    const parsedData = data ? JSON.parse(data) : []
+
+    return Array.isArray(parsedData) ? parsedData : []
+  } catch {
+    localStorage.removeItem(STORAGE_KEY)
+    return []
+  }
 }
 
 export function saveAnalysis(result, requestData) {
   const history = getHistory()
+  const score = result?.score ?? result?.financial_score ?? 0
 
   const newEntry = {
     id: crypto.randomUUID(),
     timestamp: new Date().toISOString(),
-    score: result.score,
-    classification: result.classification,
+    score,
+    classification: result?.classification || "Indefinido",
     receita: requestData.receita,
     despesas: requestData.despesas,
     divida: requestData.divida,
@@ -21,7 +29,11 @@ export function saveAnalysis(result, requestData) {
 
   const updatedHistory = [...history, newEntry].slice(-20)
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory))
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedHistory))
+  } catch {
+    // Storage can fail in private mode or when quota is exceeded.
+  }
 }
 
 export function clearHistory() {

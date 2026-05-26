@@ -23,7 +23,25 @@ export default function ResultPage({
   const navigate = useNavigate()
 
   if (!result) {
-    return <p>Nenhum resultado disponível.</p>
+    return (
+      <main className="empty-state-page">
+        <section className="card empty-state-card">
+          <span className="eyebrow">Resultado</span>
+          <h1>Nenhum diagnóstico disponível</h1>
+          <p>
+            Inicie uma nova análise para gerar seu score financeiro e visualizar
+            recomendações personalizadas.
+          </p>
+          <button
+            className="primary-button"
+            type="button"
+            onClick={() => navigate("/collection")}
+          >
+            Iniciar análise
+          </button>
+        </section>
+      </main>
+    )
   }
 
   const prediction = result?.prediction
@@ -33,8 +51,11 @@ export default function ResultPage({
 
   const chartData =
     history?.map((item, index) => ({
-      index: index + 1,
-      score: item?.result?.financial_score || 0,
+      label: item?.timestamp
+        ? new Date(item.timestamp).toLocaleDateString("pt-BR")
+        : `Análise ${index + 1}`,
+      score:
+        item?.score ?? item?.result?.score ?? item?.result?.financial_score ?? 0,
     })) || []
 
   const handleReset = () => {
@@ -68,7 +89,7 @@ export default function ResultPage({
             <div>
               <span>Score projetado</span>
 
-              <strong>{prediction.projected_score_30d}</strong>
+              <strong>{prediction.projected_score_30d ?? "-"}</strong>
             </div>
 
             <div>
@@ -82,20 +103,27 @@ export default function ResultPage({
             <div>
               <span>Confiança</span>
 
-              <strong>{Math.round(prediction.confidence * 100)}%</strong>
+              <strong>
+                {Number.isFinite(prediction.confidence)
+                  ? `${Math.round(prediction.confidence * 100)}%`
+                  : "-"}
+              </strong>
             </div>
 
             <div>
               <span>Variação projetada</span>
 
               <strong>
-                {prediction.delta > 0 ? "+" : ""}
-                {prediction.delta.toFixed(1)}
+                {Number.isFinite(prediction.delta)
+                  ? `${prediction.delta > 0 ? "+" : ""}${prediction.delta.toFixed(1)}`
+                  : "-"}
               </strong>
             </div>
           </div>
 
-          <p>{prediction.prediction_context}</p>
+          {prediction.prediction_context ? (
+            <p className="prediction-context">{prediction.prediction_context}</p>
+          ) : null}
 
           {predictionFactors.length > 0 ? (
             <ul className="prediction-factors">

@@ -55,9 +55,17 @@ export default function App() {
       if (err.response?.status === 422) {
         setError("Dados inválidos. Revise os campos informados.")
       } else if (err.response?.status === 500) {
-        setError("Erro interno do servidor.")
+        setError(
+          "Não conseguimos concluir a análise agora. Tente novamente em instantes.",
+        )
+      } else if (err.code === "ECONNABORTED") {
+        setError(
+          "A análise demorou mais que o esperado. Verifique sua conexão e tente novamente.",
+        )
       } else {
-        setError("Falha de conexão com o servidor.")
+        setError(
+          "Falha de conexão com o servidor. Verifique sua internet e tente novamente.",
+        )
       }
     } finally {
       setLoading(false)

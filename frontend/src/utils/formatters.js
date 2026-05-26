@@ -1,5 +1,7 @@
 export function formatCurrency(value) {
-  return Number(value).toLocaleString("pt-BR", {
+  const amount = Number(value)
+
+  return (Number.isFinite(amount) ? amount : 0).toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
   })

@@ -1,15 +1,10 @@
-import { getHistory } from "../utils/historyStorage"
-import { clearHistory } from "../utils/historyStorage"
+import { useState } from "react"
 
+import { formatCurrency } from "../utils/formatters"
+import { clearHistory, getHistory } from "../utils/historyStorage"
 
 export default function HistoryPanel() {
-  const history = getHistory()
-
-  const formatCurrency = (value) =>
-    new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(Number(value || 0))
+  const [history, setHistory] = useState(() => getHistory())
 
   const formatDate = (date) => new Date(date).toLocaleDateString("pt-BR")
 
@@ -46,8 +41,9 @@ export default function HistoryPanel() {
         className="secondary-button"
         onClick={() => {
           clearHistory()
-          window.location.reload()
+          setHistory([])
         }}
+        type="button"
       >
         Limpar histórico
       </button>

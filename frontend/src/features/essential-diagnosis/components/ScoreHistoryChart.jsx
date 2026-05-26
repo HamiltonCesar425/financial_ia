@@ -14,15 +14,15 @@ function ScoreHistoryChart({ data }) {
   }
 
   return (
-    <section className="bg-white rounded-2x1 shadow-md p-6 mt-8">
-      <h2 className="text-x1 font-semibold md-4">
+    <section className="bg-white rounded-2xl shadow-md p-6 mt-8">
+      <h2 className="text-xl font-semibold mb-4">
         Evolução do Score Financeiro
       </h2>
 
       <ResponsiveContainer width="100%" height={320}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
+          <XAxis dataKey="label" />
           <YAxis domain={[0, 100]} />
 
           <Tooltip />

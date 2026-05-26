@@ -102,7 +102,7 @@ def contact(payload: ContactRequest):
     contact_dir.mkdir(parents=True, exist_ok=True) 
 
     record = {
-        "received_at": datetime.now(timezone.utc).isoformt(),
+        "received_at": datetime.now(timezone.utc).isoformat(),
         "name": payload.name,
         "email": payload.email,
         "message": payload.message,

@@ -8,6 +8,8 @@ const initialForm = {
   message: "",
 }
 
+const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+
 export default function Contact() {
   const [formData, setFormData] = useState(initialForm)
   const [status, setStatus] = useState("idle")
@@ -29,17 +31,21 @@ export default function Contact() {
   const handleSubmit = async (event) => {
     event.preventDefault()
 
+    if (status === "sending") {
+      return
+    }
+
     if (formData.name.trim().length < 2) {
       setError("Informe um nome válido.")
       return
     }
 
-    if (!formData.email.includes("@")) {
+    if (!isValidEmail(formData.email)) {
       setError("Informe um email válido.")
       return
     }
 
-    if (formData.message.trim().length < 3) {
+    if (formData.message.trim().length < 10) {
       setError("Escreva uma mensagem um pouco mais completa.")
       return
     }
@@ -49,9 +55,9 @@ export default function Contact() {
 
     try {
       await sendContact({
-        name: formData.name,
-        email: formData.email,
-        message: formData.message,
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        message: formData.message.trim(),
       })
 
       setFormData(initialForm)
@@ -76,12 +82,14 @@ export default function Contact() {
         </p>
       </header>
 
-      <form className="feedback-form" onSubmit={handleSubmit}>
+      <form className="feedback-form" noValidate onSubmit={handleSubmit}>
         <label>
           <span>Nome</span>
 
           <input
+            aria-invalid={error.includes("nome") ? "true" : "false"}
             autoComplete="name"
+            disabled={status === "sending"}
             name="name"
             placeholder="Seu nome"
             type="text"
@@ -94,9 +102,11 @@ export default function Contact() {
           <span>Email</span>
 
           <input
+            aria-invalid={error.includes("email") ? "true" : "false"}
             autoComplete="email"
+            disabled={status === "sending"}
             name="email"
-            placeholder="Seu melhor email"
+            placeholder="Seu email"
             type="email"
             value={formData.email}
             onChange={(event) => handleChange("email", event.target.value)}
@@ -107,6 +117,8 @@ export default function Contact() {
           <span>Mensagem</span>
 
           <textarea
+            aria-invalid={error.includes("mensagem") ? "true" : "false"}
+            disabled={status === "sending"}
             name="message"
             placeholder="Escreva sua mensagem."
             rows="7"
@@ -115,10 +127,16 @@ export default function Contact() {
           />
         </label>
 
-        {error && <p className="feedback-error">{error}</p>}
+        {error && (
+          <p className="feedback-error" role="alert">
+            {error}
+          </p>
+        )}
 
         {status === "success" && (
-          <p className="feedback-success">Mensagem enviada com sucesso.</p>
+          <p className="feedback-success" role="status">
+            Mensagem enviada com sucesso.
+          </p>
         )}
 
         <button

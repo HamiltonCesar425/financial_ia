@@ -1,5 +1,51 @@
 import { useState } from "react"
 
+const fields = [
+  {
+    id: "receita",
+    label: "Receita mensal",
+    placeholder: "5000",
+    helper: "Informe sua entrada financeira mensal principal.",
+  },
+  {
+    id: "despesas",
+    label: "Despesas mensais",
+    placeholder: "3000",
+    helper: "Some seus custos fixos e recorrentes.",
+  },
+  {
+    id: "divida",
+    label: "Dívida atual",
+    placeholder: "1000",
+    helper: "Inclua financiamentos, empréstimos e parcelamentos.",
+  },
+  {
+    id: "reserva",
+    label: "Reserva financeira",
+    placeholder: "2000",
+    helper: "Valor disponível para emergências ou liquidez imediata.",
+  },
+]
+
+const parseCurrencyValue = (value) => {
+  const sanitizedValue = value
+    .trim()
+    .replace(/^R\$\s?/i, "")
+    .replace(/\s/g, "")
+
+  if (!sanitizedValue) {
+    return Number.NaN
+  }
+
+  const normalizedValue = sanitizedValue.includes(",")
+    ? sanitizedValue.replace(/\./g, "").replace(",", ".")
+    : sanitizedValue.replace(/^(\d{1,3})(\.\d{3})+$/, (value) =>
+        value.replace(/\./g, ""),
+      )
+
+  return Number(normalizedValue)
+}
+
 export default function ScoreForm({ onSubmit, loading }) {
   const [formData, setFormData] = useState({
     receita: "",
@@ -10,64 +56,63 @@ export default function ScoreForm({ onSubmit, loading }) {
 
   const [errors, setErrors] = useState({})
 
-  const fields = [
-    {
-      id: "receita",
-      label: "Receita mensal",
-      placeholder: "5000",
-      helper: "Informe sua entrada financeira mensal principal.",
-    },
-    {
-      id: "despesas",
-      label: "Despesas mensais",
-      placeholder: "3000",
-      helper: "Some seus custos fixos e recorrentes.",
-    },
-    {
-      id: "divida",
-      label: "Dívida atual",
-      placeholder: "1000",
-      helper: "Inclua financiamentos, empréstimos e parcelamentos.",
-    },
-    {
-      id: "reserva",
-      label: "Reserva financeira",
-      placeholder: "2000",
-      helper: "Valor disponível para emergências ou liquidez imediata.",
-    },
-  ]
-
   const validate = () => {
     const nextErrors = {}
+    const parsedData = {
+      receita: parseCurrencyValue(formData.receita),
+      despesas: parseCurrencyValue(formData.despesas),
+      divida: parseCurrencyValue(formData.divida),
+      reserva: parseCurrencyValue(formData.reserva),
+    }
 
-    const receita = Number(formData.receita)
-    const despesas = Number(formData.despesas)
-    const divida = Number(formData.divida)
-    const reserva = Number(formData.reserva)
-
-    if (formData.receita === "" || Number.isNaN(receita) || receita <= 0) {
+    if (
+      formData.receita.trim() === "" ||
+      !Number.isFinite(parsedData.receita) ||
+      parsedData.receita <= 0
+    ) {
       nextErrors.receita = "Informe uma receita válida."
     }
 
-    if (formData.despesas === "" || Number.isNaN(despesas) || despesas < 0) {
+    if (
+      formData.despesas.trim() === "" ||
+      !Number.isFinite(parsedData.despesas) ||
+      parsedData.despesas < 0
+    ) {
       nextErrors.despesas = "Informe despesas válidas."
     }
 
-    if (formData.divida === "" || Number.isNaN(divida) || divida < 0) {
+    if (
+      formData.divida.trim() === "" ||
+      !Number.isFinite(parsedData.divida) ||
+      parsedData.divida < 0
+    ) {
       nextErrors.divida = "Informe uma dívida válida."
     }
 
-    if (formData.reserva === "" || Number.isNaN(reserva) || reserva < 0) {
+    if (
+      formData.reserva.trim() === "" ||
+      !Number.isFinite(parsedData.reserva) ||
+      parsedData.reserva < 0
+    ) {
       nextErrors.reserva = "Informe uma reserva válida."
     }
 
-    if (despesas > receita) {
+    if (
+      !nextErrors.receita &&
+      !nextErrors.despesas &&
+      parsedData.despesas > parsedData.receita
+    ) {
       nextErrors.despesas =
         "As despesas não podem ultrapassar sua receita mensal."
     }
 
     setErrors(nextErrors)
-    return Object.keys(nextErrors).length === 0
+
+    if (Object.keys(nextErrors).length > 0) {
+      return null
+    }
+
+    return parsedData
   }
 
   const handleChange = (field, value) => {
@@ -76,25 +121,27 @@ export default function ScoreForm({ onSubmit, loading }) {
       [field]: value,
     }))
 
-    setErrors((current) => ({
-      ...current,
-      [field]: undefined,
-    }))
+    setErrors((current) => {
+      const nextErrors = { ...current }
+      delete nextErrors[field]
+      return nextErrors
+    })
   }
 
   const handleSubmit = (event) => {
     event.preventDefault()
 
-    if (!validate()) {
+    if (loading) {
       return
     }
 
-    onSubmit({
-      receita: Number(formData.receita),
-      despesas: Number(formData.despesas),
-      divida: Number(formData.divida),
-      reserva: Number(formData.reserva),
-    })
+    const parsedData = validate()
+
+    if (!parsedData) {
+      return
+    }
+
+    onSubmit(parsedData)
   }
 
   return (
@@ -104,6 +151,12 @@ export default function ScoreForm({ onSubmit, loading }) {
           <span>{field.label}</span>
 
           <input
+            aria-describedby={`${field.id}-helper ${
+              errors[field.id] ? `${field.id}-error` : ""
+            }`.trim()}
+            aria-invalid={errors[field.id] ? "true" : "false"}
+            disabled={loading}
+            id={field.id}
             inputMode="decimal"
             name={field.id}
             placeholder={field.placeholder}
@@ -112,10 +165,12 @@ export default function ScoreForm({ onSubmit, loading }) {
             onChange={(event) => handleChange(field.id, event.target.value)}
           />
 
-          <small>{field.helper}</small>
+          <small id={`${field.id}-helper`}>{field.helper}</small>
 
           {errors[field.id] ? (
-            <p className="field-error">{errors[field.id]}</p>
+            <p className="field-error" id={`${field.id}-error`}>
+              {errors[field.id]}
+            </p>
           ) : null}
         </label>
       ))}
