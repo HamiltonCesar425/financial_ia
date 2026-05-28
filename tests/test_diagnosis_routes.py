@@ -79,7 +79,7 @@ def test_diagnosis_json_endpoint_accepts_empty_history():
         "trend": "ESTAVEL",
         "volatility": "unknown",
         "change_speed": "unknown",
-        "message": "Ainda nao ha historico suficiente para interpretar sua evolucao financeira.",
+        "message": "Ainda não há histórico suficiente para interpretar sua evolução financeira.",
         "delta": 0,
     }
 

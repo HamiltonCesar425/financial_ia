@@ -29,7 +29,7 @@ def generate_insights(history: list[dict[str, Any]]) -> dict[str, Any]:
             "volatility": "unknown",
             "change_speed": "unknown",
             "delta": 0,
-            "message": "Ainda nao ha historico suficiente para interpretar sua evolucao financeira.",
+            "message": "Ainda não há histórico suficiente para interpretar sua evolução financeira.",
         }
 
     scores = [entry["score"] for entry in entries]
@@ -177,7 +177,7 @@ def _build_message(
         if change_speed == "abrupt":
             return "Seu score apresentou melhora acelerada " "nas últimas análises."
 
-        return "Seu histórico mostra evolucão positiva e consistente."
+        return "Seu histórico mostra evolução positiva e consistente."
 
     if trend == "CRITICA":
         return "Foi detectada deterioração acentuada " "que exige intervenção imediata."
@@ -187,7 +187,7 @@ def _build_message(
 
     if pattern == "high_oscillation":
         return (
-            "Foram detectadas oscilacões relevantes "
+            "Foram detectadas oscilações relevantes "
             "que indicam comportamento inconsistente."
         )
 
