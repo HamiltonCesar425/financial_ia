@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Routes, Route, useNavigate } from "react-router-dom"
 
 import Home from "./features/essential-diagnosis/pages/Home"
@@ -10,7 +10,7 @@ import ResultPage from "./features/essential-diagnosis/pages/ResultPage"
 
 import ScrollToTop from "./components/ScrollToTop"
 
-import { generateDiagnosis } from "./services/api"
+import { generateDiagnosis, warmUpApi } from "./services/api"
 
 import { getHistory, saveAnalysis } from "./utils/historyStorage"
 
@@ -23,6 +23,12 @@ export default function App() {
   const [lastPayload, setLastPayload] = useState(null)
 
   const history = getHistory()
+
+  useEffect(() => {
+    warmUpApi().catch(() => {
+      // Warm-up is best effort; the submit flow still handles API errors.
+    })
+  }, [])
 
   const insight = result?.insights || {
     message: "Análise indisponível.",
@@ -64,7 +70,7 @@ export default function App() {
         )
       } else {
         setError(
-          "Falha de conexão com o servidor. Verifique sua internet e tente novamente."
+          "Não conseguimos conectar ao servidor agora. Aguarde alguns instantes e tente novamente."
         )
       }
     } finally {

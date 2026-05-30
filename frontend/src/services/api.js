@@ -17,6 +17,13 @@ export const generateDiagnosis = async (payload) => {
   return response.data
 }
 
+export const warmUpApi = async () => {
+  const response = await instance.get("/health", {
+    timeout: 8000,
+  })
+  return response.data
+}
+
 export const sendFeedback = async (payload) => {
   const response = await instance.post("/feedback", payload)
   return response.data

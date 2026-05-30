@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 const fields = [
   {
@@ -46,6 +46,34 @@ const parseCurrencyValue = (value) => {
   return Number(normalizedValue)
 }
 
+const loadingMessages = [
+  {
+    seconds: 0,
+    button: "Inicializando análise financeira...",
+    note: "Estamos preparando sua análise. Na primeira tentativa, isso pode levar alguns segundos.",
+  },
+  {
+    seconds: 8,
+    button: "Conectando ao motor de análise...",
+    note: "O serviço pode estar acordando agora. Mantenha esta tela aberta; a análise continuará automaticamente.",
+  },
+  {
+    seconds: 18,
+    button: "Processando seus indicadores...",
+    note: "A primeira resposta pode ser mais lenta, mas as próximas análises costumam carregar mais rápido.",
+  },
+  {
+    seconds: 30,
+    button: "Quase lá...",
+    note: "Ainda estamos aguardando a resposta do servidor. Se passar de um minuto, tente novamente.",
+  },
+]
+
+const getLoadingMessage = (elapsedSeconds) =>
+  [...loadingMessages]
+    .reverse()
+    .find((message) => elapsedSeconds >= message.seconds)
+
 export default function ScoreForm({ onSubmit, loading }) {
   const [formData, setFormData] = useState({
     receita: "",
@@ -55,6 +83,23 @@ export default function ScoreForm({ onSubmit, loading }) {
   })
 
   const [errors, setErrors] = useState({})
+  const [elapsedSeconds, setElapsedSeconds] = useState(0)
+
+  useEffect(() => {
+    if (!loading) {
+      return undefined
+    }
+
+    const startedAt = Date.now()
+
+    const intervalId = window.setInterval(() => {
+      setElapsedSeconds(Math.floor((Date.now() - startedAt) / 1000))
+    }, 1000)
+
+    return () => window.clearInterval(intervalId)
+  }, [loading])
+
+  const loadingMessage = getLoadingMessage(elapsedSeconds)
 
   const validate = () => {
     const nextErrors = {}
@@ -141,6 +186,7 @@ export default function ScoreForm({ onSubmit, loading }) {
       return
     }
 
+    setElapsedSeconds(0)
     onSubmit(parsedData)
   }
 
@@ -176,15 +222,12 @@ export default function ScoreForm({ onSubmit, loading }) {
       ))}
 
       <button className="primary-button" disabled={loading} type="submit">
-        {loading
-          ? "Inicializando análise financeira..."
-          : "Calcular meu diagnóstico"}
+        {loading ? loadingMessage.button : "Calcular meu diagnóstico"}
       </button>
 
       {loading ? (
         <p className="loading-note" role="status">
-          Estamos preparando sua análise. Na primeira tentativa, isso pode levar
-          alguns segundos.
+          {loadingMessage.note}
         </p>
       ) : null}
     </form>

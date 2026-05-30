@@ -731,7 +731,24 @@ body {
 }
 
 .score-history-chart {
-  height: 360px;
+  display: grid;
+  gap: 1rem;
+}
+
+.score-history-plot {
+  height: 280px;
+  min-height: 0;
+}
+
+.score-history-empty {
+  color: #334155;
+}
+
+.score-history-empty p {
+  max-width: 680px;
+  margin: 0;
+  color: #475569;
+  line-height: 1.65;
 }
 
 .prediction-factors {
@@ -753,8 +770,9 @@ body {
 .empty-state-page {
   min-height: 100vh;
   display: grid;
-  place-items: center;
-  padding: 1.5rem;
+  justify-items: center;
+  align-items: start;
+  padding: clamp(5rem, 14vh, 8rem) 1.5rem 2rem;
 }
 
 .empty-state-card {
@@ -762,9 +780,12 @@ body {
 }
 
 .empty-state-card h1 {
+  max-width: 14ch;
   margin: 0.75rem 0;
   color: #0f172a;
   font-size: 2rem;
+  line-height: 1.15;
+  text-wrap: balance;
 }
 
 .empty-state-card p {
@@ -796,6 +817,20 @@ body {
   .result-page {
     width: min(100% - 1rem, 100%);
     padding: 1rem 0;
+  }
+
+  .empty-state-page {
+    min-height: 100svh;
+    padding: clamp(5rem, 16svh, 7rem) 1rem 1.5rem;
+  }
+
+  .empty-state-card {
+    max-width: 28rem;
+  }
+
+  .empty-state-card h1 {
+    max-width: 18ch;
+    font-size: 1.8rem;
   }
 
   .hero {
@@ -911,9 +946,17 @@ body {
   }
 
   .score-history-chart {
-    height: 300px;
     margin-top: 1.25rem;
     padding: 1rem;
+  }
+
+  .score-history-plot {
+    height: 240px;
+  }
+
+  .score-history-empty {
+    margin-top: 1.25rem;
+    padding: 1.25rem;
   }
 
   .score-hero strong {
@@ -945,7 +988,11 @@ body {
   }
 
   .score-history-chart {
-    height: 260px;
+    height: auto;
+  }
+
+  .score-history-plot {
+    height: 220px;
   }
 }
 
