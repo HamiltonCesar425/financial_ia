@@ -52,7 +52,7 @@ export default function ResultPage({
   const chartData =
     history?.map((item, index) => ({
       label: item?.timestamp
-        ? new Date(item.timestamp).toLocaleDateString("pt-BR")
+        ? new Date(item.timestamp).toLocaleString("pt-BR")
         : `Análise ${index + 1}`,
       score:
         item?.score ??
@@ -60,7 +60,6 @@ export default function ResultPage({
         item?.result?.financial_score ??
         0,
     })) || []
-
   const handleReset = () => {
     setResult(null)
     setLastPayload(null)

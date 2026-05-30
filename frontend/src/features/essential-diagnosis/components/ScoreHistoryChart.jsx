@@ -9,7 +9,7 @@ import {
 } from "recharts"
 
 function ScoreHistoryChart({ data }) {
-  if (!data.length) {
+    if (!data.length) {
     return null
   }
 
