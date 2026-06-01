@@ -206,6 +206,19 @@ body {
   transform: translateY(-1px);
 }
 
+.page-return-link {
+  display: inline-flex;
+  width: fit-content;
+  color: #2563eb;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.page-return-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
 .hero-disclaimer {
   color: #64748b;
   font-size: 0.98rem;
@@ -626,6 +639,36 @@ body {
 
 .secondary-button:hover {
   background: #1f2937;
+}
+
+.result-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+}
+
+.secondary-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 3.25rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #111827;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+.secondary-link:hover {
+  border-color: #94a3b8;
+  background: #f8fafc;
+}
+
+.secondary-link.muted {
+  color: #2563eb;
 }
 
 .legal-note {

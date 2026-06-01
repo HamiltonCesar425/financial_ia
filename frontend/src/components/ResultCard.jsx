@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom"
+
 import { formatCurrency } from "../utils/formatters"
 
 export default function ResultCard({ result, requestData, onReset }) {
@@ -89,9 +91,19 @@ export default function ResultCard({ result, requestData, onReset }) {
         </div>
       ) : null}
 
-      <button onClick={onReset} className="secondary-button" type="button">
-        Refazer análise
-      </button>
+      <div className="result-actions" aria-label="Ações do resultado">
+        <button onClick={onReset} className="secondary-button" type="button">
+          Refazer análise
+        </button>
+
+        <Link className="secondary-link" to="/feedback">
+          Enviar feedback
+        </Link>
+
+        <Link className="secondary-link muted" to="/">
+          Início
+        </Link>
+      </div>
 
       <p className="legal-note">
         Esta análise tem caráter informativo e não substitui orientação
