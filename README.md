@@ -1,63 +1,76 @@
 # Financial IA
 
-## Plataforma de diagnóstico financeiro com backend observável, frontend web e pipeline seguro
+Plataforma web para diagnóstico financeiro automatizado, criada para transformar informações financeiras simples em score, classificação de risco, recomendações iniciais e leitura evolutiva do histórico do usuário.
 
-Financial IA é uma aplicação full stack criada para transformar dados financeiros simples em um diagnóstico rápido, legível e acionável. A proposta do projeto é unir experiência de produto, engenharia de software e práticas modernas de confiabilidade em uma solução que recebe receita, despesas e dívida, calcula um score financeiro e devolve classificação e recomendação prática.
+**URL pública atual:** <https://financial-ia-sandy.vercel.app>
 
-Além da experiência do usuário, o projeto foi estruturado com foco em qualidade operacional: cobertura de testes elevada, análise estática, auditoria de dependências com lockfiles reproduzíveis e pipeline de CI preparado para evitar regressões futuras.
+**Status:** Produção Inicial (Founder Release) - MVP publicado e disponível para testes públicos.
 
-## Destaques do projeto
+> O endereço `financial-ia.vercel.app` não é a URL pública deste projeto. Para testes e divulgação, use a URL oficial acima.
 
-- backend em FastAPI com rotas de aplicação, saúde e métricas
-- frontend em React/Vite para interação rápida e objetiva
-- motor de cálculo com classificação e recomendação financeira
-- camada adicional de diagnóstico estruturado via JSON e CSV
-- observabilidade com Prometheus e Grafana
-- suíte de testes automatizados com cobertura acima do mínimo exigido
-- auditoria de dependências com `pip-audit` baseada em lockfiles
-- workflow de CI consolidado com controle de concorrência para evitar filas desnecessárias
+## Visão Geral
 
-## O que a aplicação entrega
+O Financial IA permite que o usuário informe receita, despesas, dívida e reserva financeira para receber uma análise objetiva da sua situação atual. A plataforma também registra o histórico local das análises para exibir evolução do score, tendência, variação histórica e um gráfico interativo.
 
-O usuário informa dados financeiros essenciais e recebe:
+O produto tem caráter informativo e educacional. Ele apoia a percepção financeira do usuário, mas não substitui orientação financeira profissional.
 
-- score financeiro
-- classificação do cenário
-- recomendação prática
-- diagnóstico estruturado por rota dedicada
-- suporte a envio de dados também por arquivo CSV
+## Funcionalidades Atuais
 
-Isso torna o projeto útil tanto como MVP de produto quanto como demonstração técnica de uma aplicação Python moderna com frontend integrado.
+- Diagnóstico financeiro automatizado
+- Score financeiro de 0 a 100
+- Classificação de risco
+- Alertas e recomendações iniciais
+- Projeção financeira de 30 dias
+- Histórico local de análises
+- Evolução do score financeiro
+- Gráfico interativo do histórico
+- Formulário de feedback do usuário
+- Página de privacidade e transparência
+- Interface responsiva para desktop e mobile
+- Health check do backend
+- Métricas de aplicação para observabilidade
 
-## Arquitetura resumida
+## Screenshots
+
+### Home
+
+![Home do Financial IA](docs/screenshots/home.png)
+
+### Diagnóstico
+
+![Tela de coleta de dados financeiros](docs/screenshots/diagnostico.png)
+
+![Resultado do diagnóstico financeiro](docs/screenshots/resultado_diagnostico.png)
+
+![Histórico com gráfico de evolução do score](docs/screenshots/evolucao_score.png)
+
+## Arquitetura
 
 ```text
-.
-├── .github/workflows/ci.yml
-├── frontend/
-├── src/
-│   ├── api/
-│   │   ├── app.py
-│   │   ├── business_metrics.py
-│   │   ├── routes/
-│   │   │   └── diagnosis.py
-│   │   └── schemas.py
-│   ├── domain/
-│   │   ├── diagnosis_service.py
-│   │   └── insights_service.py
-│   ├── observability/
-│   │   ├── http_metrics_middleware.py
-│   │   └── registry.py
-│   └── ...
-├── tests/
-├── requirements.txt
-├── requirements-dev.txt
-├── requirements.lock
-├── requirements-dev.lock
-└── README.md
+Frontend
+└─ React + Vite
+
+Backend
+└─ FastAPI + Pydantic
+
+Deploy
+├─ Vercel (Frontend)
+└─ Render (Backend)
+
+Monitoramento
+└─ Health check + métricas Prometheus
 ```
 
-## Stack técnica
+## Stack Técnica
+
+### Frontend
+
+- React
+- Vite
+- React Router
+- Recharts
+- Axios
+- CSS/Tailwind utilities
 
 ### Backend
 
@@ -65,15 +78,9 @@ Isso torna o projeto útil tanto como MVP de produto quanto como demonstração 
 - FastAPI
 - Pydantic
 - scikit-learn
-- hmmlearn
 - Prometheus instrumentation
 
-### Frontend
-
-- React
-- Vite
-
-### Qualidade e segurança
+### Qualidade e Segurança
 
 - pytest
 - pytest-cov
@@ -83,50 +90,95 @@ Isso torna o projeto útil tanto como MVP de produto quanto como demonstração 
 - pip-tools
 - GitHub Actions
 
-## Execução local
+## Estrutura do Projeto
 
-### 1. Criar ambiente virtual
+```text
+.
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── features/essential-diagnosis/
+│   │   ├── services/
+│   │   └── utils/
+│   └── vercel.json
+├── src/
+│   ├── api/
+│   ├── app/
+│   ├── core/
+│   ├── domain/
+│   ├── engine/
+│   ├── observability/
+│   └── services/
+├── tests/
+├── monitoring/
+├── docs/
+│   └── screenshots/
+├── requirements.lock
+├── requirements-dev.lock
+└── README.md
+```
+
+## Deploy
+
+### Frontend
+
+Publicado na Vercel:
+
+- <https://financial-ia-sandy.vercel.app>
+
+Deploy manual, quando necessário:
+
+```powershell
+cd frontend
+vercel --prod
+```
+
+### Backend
+
+Publicado no Render:
+
+- <https://financial-ia.onrender.com>
+
+Rotas públicas úteis:
+
+- <https://financial-ia.onrender.com/>
+- <https://financial-ia.onrender.com/health>
+- <https://financial-ia.onrender.com/docs>
+
+## Configuração de Ambiente
+
+Para conectar o frontend ao backend publicado:
+
+```env
+VITE_API_URL=https://financial-ia.onrender.com
+```
+
+Em desenvolvimento local, se `VITE_API_URL` não estiver definida, o frontend usa:
+
+```text
+http://localhost:8000
+```
+
+## Execução Local
+
+### Backend
 
 ```powershell
 python -m venv .venv
 .venv\Scripts\Activate.ps1
-```
-
-### 2. Instalar dependências reproduzíveis
-
-Ambiente completo de desenvolvimento:
-
-```powershell
 python -m pip install --upgrade pip setuptools wheel
 python -m pip install -r requirements-dev.lock
-```
-
-Apenas dependências principais:
-
-```powershell
-python -m pip install -r requirements.lock
-```
-
-### 3. Subir o backend
-
-```powershell
 uvicorn src.api.app:app --reload
 ```
 
-Rotas locais:
+Backend local:
 
-- `http://localhost:8000/`
-- `http://localhost:8000/health`
-- `http://localhost:8000/docs`
-- `http://localhost:8000/metrics`
+- <http://localhost:8000>
+- <http://localhost:8000/health>
+- <http://localhost:8000/docs>
+- <http://localhost:8000/metrics>
 
-Principais endpoints:
-
-- `POST /score`
-- `POST /diagnosis`
-- `POST /upload/csv`
-
-### 4. Subir o frontend
+### Frontend
 
 ```powershell
 cd frontend
@@ -136,172 +188,61 @@ npm run dev
 
 Frontend local:
 
-- `http://localhost:5173`
+- <http://localhost:5173>
 
-## Configuração de ambiente
+## Principais Endpoints
 
-Para conectar o frontend ao backend publicado:
-
-```env
-VITE_API_URL=https://financial-ia.onrender.com
+```text
+GET  /health
+GET  /metrics
+POST /score
+POST /feedback
+POST /diagnosis
+POST /upload/csv
 ```
 
-Se `VITE_API_URL` não estiver definida, o frontend usa `http://localhost:8000`.
-
-## Fluxos de diagnóstico
-
-Além da rota principal de score, a aplicação também oferece um fluxo de diagnóstico dedicado.
-
-### Diagnóstico via JSON
-
-Envia receita e despesas diretamente:
+### Exemplo de Payload do Score
 
 ```json
 {
-  "receita": 1000,
-  "despesas": 400
+  "receita": 6500,
+  "despesas": 3600,
+  "divida": 1200,
+  "reserva": 9000,
+  "history": []
 }
 ```
 
-Resposta esperada:
+### Exemplo de Resposta
 
 ```json
 {
-  "score": 60,
-  "message": "Situação estável",
-  "recommendation": "Otimizar investimentos"
+  "score": 84,
+  "classification": "Saudável",
+  "diagnosis": "Sua estrutura financeira apresenta bom equilíbrio.",
+  "recommendations": [
+    "Realizar revisão financeira mensal",
+    "Manter reserva de emergência",
+    "Acompanhar evolução do score"
+  ],
+  "prediction": {
+    "projected_score_30d": 86,
+    "trend": "stable",
+    "confidence": 0.92
+  }
 }
-```
-
-### Diagnóstico via CSV
-
-O endpoint `POST /upload/csv` aceita arquivos com colunas:
-
-- `receita` e `despesas`
-- ou `income` e `expenses`
-
-Isso permite evoluir a aplicação para cenários de ingestão simples sem quebrar a consistência do domínio.
-
-## Qualidade, testes e segurança
-
-### Lint
-
-```powershell
-python -m ruff check .
-```
-
-### Testes com cobertura
-
-```powershell
-python -m pytest --cov=src --cov-report=term-missing
-```
-
-### Segurança estática
-
-```powershell
-python -m bandit -r src -ll
-```
-
-### Auditoria de dependências
-
-Produção:
-
-```powershell
-python -m pip_audit -r requirements.lock
-```
-
-Desenvolvimento:
-
-```powershell
-python -m pip_audit -r requirements-dev.lock
-```
-
-## Estratégia de dependências
-
-O projeto usa dois níveis de gerenciamento:
-
-- `requirements.txt` e `requirements-dev.txt` para dependências diretas
-- `requirements.lock` e `requirements-dev.lock` para árvore completa congelada
-
-Essa abordagem foi adotada para melhorar:
-
-- reprodutibilidade local e no CI
-- previsibilidade de instalações
-- rastreabilidade de mudanças
-- auditoria de segurança com menos ruído
-
-Para regenerar os lockfiles:
-
-```powershell
-.venv\Scripts\pip-compile requirements.txt --cache-dir .pip-tools-cache --output-file requirements.lock
-.venv\Scripts\pip-compile requirements-dev.txt --cache-dir .pip-tools-cache --output-file requirements-dev.lock
-```
-
-Fluxo recomendado ao atualizar dependências:
-
-1. atualizar os arquivos base
-2. regenerar os lockfiles
-3. rodar lint, testes, Bandit e `pip-audit`
-4. validar o CI antes de promover novas alterações
-
-## CI/CD
-
-O pipeline em `.github/workflows/ci.yml` foi consolidado para refletir uma rotina de engenharia mais robusta. Ele executa:
-
-1. checkout do código
-2. setup do Python com cache de `pip`
-3. instalação por `requirements-dev.lock`
-4. lint com Ruff
-5. testes com cobertura
-6. análise estática com Bandit
-7. auditoria de dependências principais via `requirements.lock`
-8. auditoria de dependências de desenvolvimento via `requirements-dev.lock`
-
-O workflow também usa `concurrency` para cancelar execuções antigas da mesma branch, reduzindo filas e ruído operacional no GitHub Actions.
-
-## Deploy
-
-> Backend
-
-Publicado em:
-
-- `https://financial-ia.onrender.com`
-
-Rotas públicas para validação:
-
-- `https://financial-ia.onrender.com/`
-- `https://financial-ia.onrender.com/health`
-- `https://financial-ia.onrender.com/docs`
-
-> Frontend
-
-Publicado em:
-
-- `https://financial-ia-sandy.vercel.app`
-
-Deploy manual, se necessário:
-
-```powershell
-vercel --prod
 ```
 
 ## Observabilidade
 
-O projeto inclui instrumentação para monitoramento local com:
+O projeto inclui rotas e estrutura para leitura operacional:
 
-- Prometheus
-- Grafana
+- `/health` para validação de disponibilidade
+- `/metrics` para métricas Prometheus
+- `src/api/business_metrics.py` para métricas de negócio
+- `src/observability/` para registry e middleware HTTP
 
-Organização atual:
-
-- `src/api/business_metrics.py`: métricas de negócio e métricas usadas pelo fluxo principal da API
-- `src/api/routes/diagnosis.py`: rotas dedicadas ao fluxo de diagnóstico e upload CSV
-- `src/domain/diagnosis_service.py`: regra de domínio para composição do diagnóstico
-- `src/domain/insights_service.py`: geração de mensagem e recomendação a partir do score
-- `src/observability/registry.py`: registro central de métricas transversais de observabilidade
-- `src/observability/http_metrics_middleware.py`: middleware de instrumentação HTTP
-
-Subida com containers:
+Ambiente local com containers:
 
 ```powershell
 docker-compose up --build
@@ -309,46 +250,58 @@ docker-compose up --build
 
 Serviços:
 
-- API: `http://localhost:8000/docs`
-- Prometheus: `http://localhost:9090`
-- Grafana: `http://localhost:3000`
+- API: <http://localhost:8000/docs>
+- Prometheus: <http://localhost:9090>
+- Grafana: <http://localhost:3000>
 
-Credenciais padrão do Grafana:
+## Qualidade, Testes e Segurança
 
-- usuário: `admin`
-- senha: `admin`
+### Lint
 
-## Valor de portfólio
+```powershell
+python -m ruff check .
+```
 
-Este projeto demonstra, de forma prática:
+### Testes com Cobertura
 
-- desenho de produto com foco em experiência e utilidade
-- backend Python estruturado para produção
-- integração entre frontend e API
-- separação entre camada de rota, schema e domínio
-- disciplina de testes e cobertura
-- preocupação real com segurança de dependências
-- maturidade de CI voltada para estabilidade, rastreabilidade e prevenção de regressões
+```powershell
+python -m pytest --cov=src --cov-report=term-missing
+```
 
-Mais do que um MVP funcional, Financial IA representa uma aplicação construída com atenção tanto ao que o usuário final enxerga quanto ao que sustenta a operação por trás.
+### Segurança Estática
 
-## O que eu construí e o que aprendi
+```powershell
+python -m bandit -r src -ll
+```
 
-Ao desenvolver este projeto, construí uma aplicação full stack capaz de transformar entradas financeiras simples em um diagnóstico com score, classificação e recomendação. Além da entrega funcional, estruturei o projeto com preocupações reais de engenharia, incluindo testes automatizados, cobertura, observabilidade, análise estática e auditoria de dependências.
+### Auditoria de Dependências
 
-Durante a evolução da aplicação, aprofundei meu entendimento sobre integração entre frontend e backend, organização de dependências Python, uso de lockfiles para reprodutibilidade, endurecimento de pipeline no GitHub Actions, modelagem de contratos com Pydantic e separação entre rotas, serviço de domínio e observabilidade. Também aprendi, na prática, a tratar segurança e confiabilidade como parte do produto, e não como etapas isoladas no fim do desenvolvimento.
+```powershell
+python -m pip_audit -r requirements.lock
+python -m pip_audit -r requirements-dev.lock
+```
 
-O resultado final não representa apenas uma interface funcional ou uma API disponível, mas uma base mais madura, auditável e preparada para evolução contínua.
+## Privacidade e Transparência
 
-## Status atual
+O Financial IA foi desenvolvido com preocupação em transparência e boas práticas de proteção de dados. A plataforma solicita apenas informações necessárias para gerar o diagnóstico financeiro e apresenta uma página dedicada à privacidade.
 
-- aplicação funcional com frontend e backend integrados
-- fluxo adicional de diagnóstico estruturado disponível via JSON e CSV
-- pipeline de CI consolidado
-- lockfiles versionados e auditados
-- observabilidade disponível para ambiente local
-- base pronta para evolução de produto e endurecimento operacional contínuo
+As informações financeiras usadas no fluxo web são fornecidas manualmente pelo usuário. O histórico exibido na interface é mantido localmente no navegador para apoiar a evolução visual do score.
 
-## Aviso legal
+Esta plataforma possui caráter informativo e educacional e não substitui orientação financeira profissional.
 
-Esta aplicação tem caráter informativo e não substitui orientação financeira profissional.
+## Roadmap
+
+- [ ] Domínio próprio (`financial-ia.com.br` ou alternativa definitiva)
+- [ ] Capturas finais de Resultado e Histórico com gráfico no README
+- [ ] Inteligência preditiva ampliada
+- [ ] Dashboard analítico avançado
+- [ ] Camada Premium
+- [ ] Histórico evolutivo ampliado
+- [ ] Exportação ou compartilhamento controlado do diagnóstico
+- [ ] Painel interno para leitura consolidada de feedbacks
+
+## Valor do Projeto
+
+Financial IA demonstra uma aplicação full stack orientada a produto, com experiência de usuário, backend estruturado, deploy em nuvem, observabilidade, testes, segurança de dependências e uma evolução clara para validação pública.
+
+O MVP já está publicado e pronto para coleta de feedback real de usuários, mantendo uma base técnica preparada para melhorias incrementais.
