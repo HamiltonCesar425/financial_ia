@@ -30,3 +30,6 @@ data/*.jsonl
 
 eslint-report.txt
 
+playwright-report/
+test-results/
+

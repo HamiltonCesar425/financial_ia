@@ -202,6 +202,7 @@ export default function ScoreForm({ onSubmit, loading }) {
             }`.trim()}
             aria-invalid={errors[field.id] ? "true" : "false"}
             disabled={loading}
+            data-testid={field.id}
             id={field.id}
             inputMode="decimal"
             name={field.id}
