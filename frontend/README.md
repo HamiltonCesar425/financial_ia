@@ -1,122 +1,106 @@
-# Frontend - Diagnóstico Financeiro Automatizado
+# Frontend - Financial IA
 
-Interface do MVP do produto **Diagnóstico Financeiro Automatizado**, responsável por coletar dados do usuário e consumir a API `/score` do backend (`financial_ia`).
+Interface web do MVP **Financial IA**, publicada em:
 
----
+<https://financial-ia-sandy.vercel.app>
 
-## 📌 Pré-requisitos
+Status: Produção Inicial (Founder Release) - disponível para testes públicos.
 
-- Node.js >= 18
-- Backend FastAPI rodando em `http://localhost:8000`
+## Função do Frontend
 
----
+O frontend coleta dados financeiros essenciais, consome a API do backend e apresenta:
 
-## ⚙️ Setup
+- diagnóstico financeiro automatizado
+- score financeiro
+- classificação de risco
+- alertas e recomendações iniciais
+- projeção financeira de 30 dias
+- histórico local de análises
+- gráfico interativo de evolução do score
+- formulário de feedback
+- páginas de privacidade e contato
 
-```bash
-npm create vite@latest frontend -- --template react
-cd frontend
-npm install
-npm install axios
-```
+## Stack
 
----
+- React
+- Vite
+- React Router
+- Recharts
+- Axios
+- CSS/Tailwind utilities
 
-## 🧱 Estrutura
+## Estrutura Principal
 
-```bash
+```text
 src/
- ├── components/
- │    ├── HeroSection.jsx
- │    ├── ValueHighlights.jsx
- │    ├── ScoreForm.jsx
- │    ├── ResultCard.jsx
- │    └── ErrorNotice.jsx
- ├── services/api.js
- ├── App.jsx
- └── main.jsx
+├── components/
+├── features/
+│   └── essential-diagnosis/
+│       ├── components/
+│       └── pages/
+├── services/
+├── utils/
+├── App.jsx
+└── main.jsx
 ```
 
----
+## Execução Local
 
-## ▶️ Execução
-
-```bash
+```powershell
+npm install
 npm run dev
 ```
 
-Frontend disponível em:
+Frontend local:
 
-```
-http://localhost:5173
-```
+<http://localhost:5173>
 
----
+## Variáveis de Ambiente
 
-## 🔗 Integração com API
+Crie um arquivo `.env.local` na raiz do frontend:
 
-Endpoint consumido:
-
-```
-POST /score
-```
-
-### Payload enviado
-
-```json
-{
-  "receita": 5000,
-  "despesas": 3000,
-  "divida": 1000
-}
-```
-
-### Resposta esperada
-
-```json
-{
-  "score": 75,
-  "classificacao": "Boa",
-  "recomendacao": "Reduza despesas variáveis"
-}
-```
-
----
-
-## 🌐 Variáveis de ambiente
-
-Crie um arquivo `.env` na raiz do frontend:
-
-```
+```env
 VITE_API_URL=http://localhost:8000
 ```
 
----
+Para produção:
 
-## ⚠️ Tratamento de erros
+```env
+VITE_API_URL=https://financial-ia.onrender.com
+```
 
-O frontend trata:
+## Scripts
 
-- `422` → Dados inválidos
-- `500` → Erro interno do servidor
-- Falha de rede → API indisponível
+```powershell
+npm run dev
+npm run lint
+npm run build
+npm run preview
+```
 
----
+## Rotas da Interface
 
-## 🧠 Comportamento da aplicação
+```text
+/           Home
+/collection Coleta de dados financeiros
+/result     Resultado do diagnóstico
+/feedback   Feedback do usuário
+/privacy    Privacidade
+/contact    Contato
+```
 
-- Validação local antes da requisição
-- Botão desabilitado durante envio
-- Estado de loading: _"Analisando seus dados..."_
-- Scroll automático para resultado
-- Possibilidade de refazer análise sem reload
+## Integração com API
 
----
+Endpoints consumidos:
 
-## 📌 Observação
+```text
+GET  /health
+POST /score
+POST /feedback
+```
 
-Este MVP tem foco em **automação simples e confiável**.
+## Observações de Produto
 
-Não representa um sistema avançado de inteligência artificial nesta versão.
+O frontend mantém o histórico de análises no navegador via `localStorage`, permitindo exibir evolução do score e gráfico histórico sem exigir autenticação nesta fase do MVP.
 
----
+A aplicação possui caráter informativo e educacional e não substitui orientação financeira profissional.

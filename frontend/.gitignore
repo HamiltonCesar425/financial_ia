@@ -3,3 +3,5 @@ dist
 eslint-report.txt
 .vite
 coverage
+playwright-report/
+test-results/
