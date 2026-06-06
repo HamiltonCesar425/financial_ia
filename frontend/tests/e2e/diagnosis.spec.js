@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test("deve concluir o fluxo principal de diagnóstico", async ({ page }) => {
-  await page.goto("http://localhost:5173");
+  await page.goto("/");
 
   await page.getByRole("button", {
     name: /testar diagnóstico/i,
